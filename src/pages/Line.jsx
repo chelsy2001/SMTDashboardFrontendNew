@@ -1,12 +1,12 @@
 import React from 'react'
 import DashboardLayout from "../partials/DashboardLayout";
 
-const Home = () => {
+const Line = () => {
   return (
     <DashboardLayout>
-      <h1> Home</h1>
+      <h1> Line</h1>
     </DashboardLayout>
   )
 }
 
-export default Home
+export default Line

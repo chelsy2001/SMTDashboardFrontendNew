@@ -1,133 +1,120 @@
 import { useState, useEffect } from "react"
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
-import loginBackground from "../assets/images/loginBackground.png"
 import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { fetchUsername } from "../services/operations/authAPI.jsx"
-import { login } from "../services/operations/authAPI.jsx"
+import { fetchUsername, login } from "../services/operations/authAPI.jsx"
+import warehouseImg from "../assets/images/loginBackground1.png"
 
-const Login = ({ switchView }) => {
+const Login = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   })
 
   const [showPassword, setShowPassword] = useState(false)
-  const [usernames, setUsernames] = useState([]) // store usernames here
+  const [usernames, setUsernames] = useState([])
 
   const { username, password } = formData
 
-  // Fetch usernames on page load
   useEffect(() => {
-  const getUsernames = async () => {
-    try {
+    const getUsernames = async () => {
       const response = await fetchUsername()()
       if (Array.isArray(response?.data)) {
-        setUsernames(response.data)  // response is your array of { Username: "..." }
+        setUsernames(response.data)
       }
-    } catch (err) {
-      console.error("Failed to fetch usernames:", err)
     }
-  }
-  getUsernames()
-}, [])
+    getUsernames()
+  }, [])
 
-
-  const handleOnChange = (e) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [e.target.name]: e.target.value,
-    }))
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleOnSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    // console.log("Logging in with:", username, password)
     dispatch(login(username, password, navigate))
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-[#00AEEF] to-[#7B2FF7] px-4">
-      <div className="w-full max-w-6xl bg-white rounded-2xl shadow-md flex flex-col md:flex-row overflow-hidden h-full md:h-[90vh]">
-        
-        {/* Left Side - Logo */}
-        <div className="w-full md:w-1/2 bg-gray-50 flex items-center justify-center p-6">
-          <img src={loginBackground} alt="background" className="w-2/3 h-auto" />
+    <div className="min-h-screen bg-[#EEF3F6] flex items-center justify-center px-4">
+      <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg grid grid-cols-1 md:grid-cols-2 overflow-hidden">
+
+        {/* LEFT – Illustration */}
+        <div className="hidden md:flex items-center justify-center bg-[#F7FAFC] p-10">
+          <img
+            src={warehouseImg}
+            alt="Warehouse Automation"
+            className="max-w-full h-auto"
+          />
         </div>
-    
-        {/* Right Side - Form */}
-        <div className="w-full md:w-1/2 p-8 flex items-center justify-center">
-          <div className="w-full max-w-md">
-            
-            {/* Title */}
-            <h2 className="text-2xl font-bold text-gray-800 mb-10 text-center">
-              Welcome to Dashboard
+
+        {/* RIGHT – Login */}
+        <div className="flex items-center justify-center p-10">
+          <div className="w-full max-w-sm">
+            <h2 className="text-3xl font-semibold text-gray-800 mb-2">
+              SMT Dashboard Login
             </h2>
-        
-            {/* Form */}
-            <form className="space-y-6 bg-gray-50 p-2 rounded" onSubmit={handleOnSubmit}>
-              
-              {/* Username Row */}
-              <div className="flex items-center gap-4">
-                <label
-                  htmlFor="username"
-                  className="w-20 md:w-24 text-base font-medium text-black"
-                >
-                  Username:
+            <p className="text-gray-500 mb-8">
+              Login to manage automation dashboard
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Username */}
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Username
                 </label>
                 <select
-                  required
                   name="username"
                   value={username}
-                  onChange={handleOnChange}
-                  className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-sm"
+                  onChange={handleChange}
+                  required
+                  className="mt-1 w-full px-4 py-3 border rounded-md focus:ring-2 focus:ring-gray-400 focus:outline-none"
                 >
-                  <option value="">Select Username</option>
-                  {usernames.map((userObj, idx) => (
-                    <option key={idx} value={userObj.Username}>
-                      {userObj.Username}
+                  <option value="">Select username</option>
+                  {usernames.map((u, i) => (
+                    <option key={i} value={u.Username}>
+                      {u.Username}
                     </option>
                   ))}
                 </select>
               </div>
-        
-              {/* Password Row */}
-              <div className="flex items-center gap-4">
-                <label
-                  htmlFor="password"
-                  className="w-20 md:w-24 text-base font-medium text-black"
-                >
+
+              {/* Password */}
+              <div>
+                <label className="text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <div className="relative flex-1">
+                <div className="relative mt-1">
                   <input
-                    required
                     type={showPassword ? "text" : "password"}
                     name="password"
                     value={password}
-                    onChange={handleOnChange}
-                    placeholder="Enter Password"
-                    className="w-full p-3 border border-gray-300 rounded-lg pr-10 focus:ring-2 focus:ring-blue-400 focus:outline-none text-sm"
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter password"
+                    className="w-full px-4 py-3 border rounded-md pr-10 focus:ring-2 focus:ring-gray-400 focus:outline-none"
                   />
                   <span
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
                   >
                     {showPassword ? (
-                      <AiOutlineEyeInvisible fontSize={20} fill="#6B7280" />
+                      <AiOutlineEyeInvisible size={18} />
                     ) : (
-                      <AiOutlineEye fontSize={20} fill="#6B7280" />
+                      <AiOutlineEye size={18} />
                     )}
                   </span>
                 </div>
               </div>
-        
-              {/* Login Button */}
+
+              {/* Button */}
               <button
                 type="submit"
-                className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition"
+                className="w-full bg-[#6B8F8A] text-white py-3 rounded-md font-medium hover:bg-[#5A7C77] transition"
               >
                 Login
               </button>

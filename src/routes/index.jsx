@@ -1,18 +1,15 @@
 import { Routes, Route } from "react-router-dom";
 import PrivateRoute from "../pages/PrivateRoute.jsx";
-
+import Line from "../pages/Line.jsx";
+import DownTime from "../pages/Downtime.jsx";
+import Assembly from "../pages/Assembly.jsx";
+import CycleTime from "../pages/CycleTime.jsx";
+import Quality from "../pages/Quality.jsx";
 // pages
 import Login from "../pages/Login.jsx";
 import Home from "../pages/Home.jsx";
 import Error from "../pages/Error.jsx";
-import MouldMaintenanceHistory from "../pages/MouldMaintenanceHistory/MouldMaintanceHistory.jsx";
-import PMStatus from "../pages/PMStatus.jsx";
-import HCStatus from "../pages/HCStatus.jsx";
-import SparePart from "../pages/SparePart.jsx";
-import MouldSummary from "../pages/MouldSummary.jsx";
-import HCHistory from "../pages/MouldMaintenanceHistory/HCHistory.jsx";
-import MouldBreakdownHistory from "../pages/MouldMaintenanceHistory/BreakDownHistory.jsx";
-import MouldSparePartHistory from "../pages/MouldMaintenanceHistory/SparePartHistory.jsx";
+
 
 export default function AppRoutes() {
   return (
@@ -28,74 +25,48 @@ export default function AppRoutes() {
         }
       />
 
+
       <Route
-        path="/MouldMaintenanceHistory"
+        path="/Line"
         element={
           <PrivateRoute>
-            <MouldMaintenanceHistory />
+            <Line />
           </PrivateRoute>
         }
       />
 
       <Route
-        path="/PMStatus"
+        path="/Assembly"
         element={
           <PrivateRoute>
-            <PMStatus />
+            <Assembly />
+          </PrivateRoute>
+        }
+      />
+
+<Route
+        path="/DownTime"
+        element={
+          <PrivateRoute>
+            <DownTime />
           </PrivateRoute>
         }
       />
 
       <Route
-        path="/HCStatus"
+        path="/CycleTime"
         element={
           <PrivateRoute>
-            <HCStatus />
+            <CycleTime />
           </PrivateRoute>
         }
       />
 
       <Route
-        path="/SparePart"
+        path="/Quality"
         element={
           <PrivateRoute>
-            <SparePart />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/MouldSummary"
-        element={
-          <PrivateRoute>
-            <MouldSummary />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/HCHistory"
-        element={
-          <PrivateRoute>
-            <HCHistory />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/MouldBreakdownHistory"
-        element={
-          <PrivateRoute>
-            <MouldBreakdownHistory />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/MouldSparePartHistory"
-        element={
-          <PrivateRoute>
-            <MouldSparePartHistory />
+            <Quality />
           </PrivateRoute>
         }
       />
