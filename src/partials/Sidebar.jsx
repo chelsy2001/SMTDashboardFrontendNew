@@ -140,12 +140,12 @@ function Sidebar({
 
 
               {/* Line  */}
-              <SidebarLinkGroup activecondition={pathname.includes("Line")}>
+              <SidebarLinkGroup activecondition={pathname.includes("LinesPreformance")}>
 
                 {(handleClick, open) => (
                     <NavLink
                       end
-                      to="/Line"
+                      to="/LinesPreformance"
                       className={({ isActive }) =>
                         `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
                           isActive
@@ -169,7 +169,7 @@ function Sidebar({
     whitespace-normal break-words leading-tight block max-w-[150px]
   "
 >
-  Line
+  Line Preformance
 </span>
 
                           </div>

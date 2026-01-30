@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import PrivateRoute from "../pages/PrivateRoute.jsx";
-import Line from "../pages/Line.jsx";
+import LinesPreformance from "../pages/LinesPreformance.jsx";
 import DownTime from "../pages/Downtime.jsx";
 import Assembly from "../pages/Assembly.jsx";
 import CycleTime from "../pages/CycleTime.jsx";
@@ -27,10 +27,10 @@ export default function AppRoutes() {
 
 
       <Route
-        path="/Line"
+        path="/LinesPreformance"
         element={
           <PrivateRoute>
-            <Line />
+            <LinesPreformance />
           </PrivateRoute>
         }
       />
