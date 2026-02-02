@@ -3,7 +3,7 @@ import PrivateRoute from "../pages/PrivateRoute.jsx";
 import LinesPreformance from "../pages/LinesPreformance.jsx";
 import DownTime from "../pages/Downtime.jsx";
 import Assembly from "../pages/Assembly.jsx";
-import CycleTime from "../pages/CycleTime.jsx";
+// import CycleTime from "../pages/CycleTime.jsx";
 import Quality from "../pages/Quality.jsx";
 // pages
 import Login from "../pages/Login.jsx";
@@ -53,14 +53,14 @@ export default function AppRoutes() {
         }
       />
 
-      <Route
+      {/* <Route
         path="/CycleTime"
         element={
           <PrivateRoute>
             <CycleTime />
           </PrivateRoute>
         }
-      />
+      /> */}
 
       <Route
         path="/Quality"

@@ -39,9 +39,42 @@ const qualityHourlyData2 = [
   { hour: "11", TotalPart: 95, RejectedPart: 91 },
   { hour: "12", TotalPart: 95, RejectedPart: 93 },
 ];
+
+const rejectionReasonData = [
+  { name: "Tool", value: 25 },
+  { name: "Method", value: 40 },
+  { name: "Process", value: 18 },
+  { name: "Material", value: 18 },
+  { name: "Other", value: 10 },
+  { name: "ABC", value: 20 },
+  { name: "DEF", value: 30 },
+  { name: "XYZ", value: 35 },
+];
+
 const CardContent = ({ children, className = "" }) => (
   <div className={`p-4 ${className}`}>{children}</div>
 );
+
+const RejectionReason = () => (
+  <>
+    <SectionHeader title=" Rejection Reason Analysis" />
+    <div className=" gap-6">
+      <Card className="bg-white rounded-xl shadow">
+        <CardContent>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={rejectionReasonData} layout="vertical">
+              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+              <YAxis type="category" dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
+              <Tooltip contentStyle={{ color: 'black' }}/>
+              <Bar dataKey="value" fill="#60a5fa" radius={[6, 6, 0, 0]}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    </div>
+  </>
+);
+
 const QualityHourlyChart = () => (
   <Card className="bg-white rounded-xl shadow">
     <CardContent>
@@ -598,6 +631,7 @@ const LinesPreformance = () => {
         <QualityHourlyChart />
 <SectionHeader title="Total Parts vs Rejection Part" />
         <QualityHourlyChart2 />
+        <RejectionReason />
       </div>
     </DashboardLayout>
   );

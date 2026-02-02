@@ -241,35 +241,6 @@ function Sidebar({
                 
               </SidebarLinkGroup>
 
-              {/* Cycle Time*/}
-              <SidebarLinkGroup activecondition={pathname.includes("CycleTime")}>
-                {(handleClick, open) => (
-                    <NavLink
-                      end
-                      to="/CycleTime"
-                      className={({ isActive }) =>
-                        `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
-                          isActive
-                            ? "text-violet-500"
-                            : "hover:text-gray-900 dark:hover:text-white"
-                        }`
-                      }
-                      onClick={() => {
-                        handleClick();
-                        setSidebarExpanded(true);
-                      }}
-                    >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                           <MdSpeed size={20} />
-                            <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                              Cycle Time
-                            </span>
-                          </div>
-                        </div>
-                    </NavLink>
-                )}
-              </SidebarLinkGroup>
 
  {/* Quality */}
               <SidebarLinkGroup activecondition={pathname.includes("Quality")}>
@@ -300,6 +271,36 @@ function Sidebar({
                     </NavLink>
                 )}
               </SidebarLinkGroup>
+
+               {/* Cycle Time*/}
+              {/* <SidebarLinkGroup activecondition={pathname.includes("CycleTime")}>
+                {(handleClick, open) => (
+                    <NavLink
+                      end
+                      to="/CycleTime"
+                      className={({ isActive }) =>
+                        `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
+                          isActive
+                            ? "text-violet-500"
+                            : "hover:text-gray-900 dark:hover:text-white"
+                        }`
+                      }
+                      onClick={() => {
+                        handleClick();
+                        setSidebarExpanded(true);
+                      }}
+                    >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                           <MdSpeed size={20} />
+                            <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                              Cycle Time
+                            </span>
+                          </div>
+                        </div>
+                    </NavLink>
+                )}
+              </SidebarLinkGroup> */}
             </ul>
           </div>
         </div>
