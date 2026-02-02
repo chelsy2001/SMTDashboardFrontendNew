@@ -103,7 +103,7 @@ const TrendChart = ({
   return (
     <Card className="mb-4 bg-white rounded-xl shadow-sm border">
       <CardContent>
-        <h3 className="font-semibold mb-3 text-gray-800 text-center">
+        <h3 className="font-bold mb-3 text-black text-center">
           {title}
         </h3>
 
@@ -124,8 +124,8 @@ const TrendChart = ({
               </linearGradient>
             </defs>
 
-            <XAxis dataKey="time" />
-            <YAxis domain={[0, 100]} />
+            <XAxis dataKey="time" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+            <YAxis domain={[0, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
             <Tooltip />
 
             <Area
@@ -243,7 +243,7 @@ const CircularChart = ({
 const SectionHeader = ({ title }) => (
   <div className="flex items-center gap-3 mb-4">
     <div className="h-12 w-1.5 bg-blue-600 rounded"></div>
-    <span className="text-xl md:text-2xl lg:text-3xl font-bold tracking-wide text-gray-900">
+    <span className="text-xl md:text-2xl lg:text-3xl font-bold tracking-wide text-black">
       {title}
     </span>
   </div>

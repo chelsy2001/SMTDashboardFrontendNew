@@ -60,9 +60,9 @@ const QualityHourlyChart = () => (
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={qualityHourlyData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hour" />
-          <YAxis domain={[80, 100]} />
-          <Tooltip />
+          <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+          <YAxis domain={[80, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+          <Tooltip contentStyle={{ color: 'black' }} />
           <Legend />
 
           <Line
@@ -91,9 +91,9 @@ const QualityHourlyChart2 = () => (
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={qualityHourlyData2}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hour" />
-          <YAxis domain={[80, 100]} />
-          <Tooltip />
+          <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
+          <YAxis domain={[80, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+          <Tooltip contentStyle={{ color: 'black' }} />
           <Legend />
 
           <Line
@@ -230,7 +230,7 @@ const TrendChart = ({
   return (
     <Card className="mb-4 bg-white rounded-xl shadow-sm border">
       <CardContent>
-        <h3 className="font-semibold mb-3 text-gray-800 text-center">
+        <h3 className="font-bold mb-3 text-black text-center">
           {title}
         </h3>
 
@@ -251,9 +251,9 @@ const TrendChart = ({
               </linearGradient>
             </defs>
 
-            <XAxis dataKey="time" />
-            <YAxis domain={[0, 100]} />
-            <Tooltip />
+            <XAxis dataKey="time" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
+            <YAxis domain={[0, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+            <Tooltip contentStyle={{ color: 'black' }} />
 
             <Area
               type="monotone"
@@ -359,7 +359,7 @@ const AssmblySelector = ({ onGroupChange }) => {
   return (
     <div className="bg-white rounded-2xl shadow px-10 py-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="text-center mb-4">
         <h3 className="font-semibold text-gray-900 text-lg">
           Assembly Groups
         </h3>
@@ -383,7 +383,7 @@ const AssmblySelector = ({ onGroupChange }) => {
                     ${
                       isActive
                         ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg border-transparent"
-                        : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-blue-50"
+                        : "bg-gray-50 text-black border-gray-200 hover:bg-blue-50"
                     }
                   `}
                 >
@@ -471,8 +471,8 @@ const StationCards = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-5">
       {Array.from({ length: 8 }).map((_, i) => (
         <Card key={i} className="bg-white rounded-lg shadow">
-          <CardContent className="space-y-2 text-sm">
-            <p className="font-semibold text-gray-800">Station {i + 1}</p>
+          <CardContent className="space-y-2">
+            <p className="font-bold text-black text-m text-center">Station {i + 1}</p>
             <KpiBar
               label="OEE"
               value={70 + Math.random() * 20}
@@ -503,12 +503,12 @@ const M4DowntimeAnalysis = () => (
       {/* Duration */}
       <Card className="bg-white rounded-xl shadow">
         <CardContent>
-          <h4 className="font-semibold mb-2">Duration Wise</h4>
+          <h4 className="font-bold mb-2 text-black text-center">Duration Wise</h4>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={downtimeData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
+              <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
+              <YAxis tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
+              <Tooltip contentStyle={{ color: 'black' }} />
               <Bar dataKey="value" fill="#60a5fa" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -518,12 +518,12 @@ const M4DowntimeAnalysis = () => (
       {/* Occurrence */}
       <Card className="bg-white rounded-xl shadow">
         <CardContent>
-          <h4 className="font-semibold mb-2">Occurrence Wise</h4>
+          <h4 className="font-bold mb-2 text-black text-center">Occurrence Wise</h4>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={downtimeData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
+              <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+              <YAxis tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+              <Tooltip contentStyle={{ color: 'black' }} />
               <Bar dataKey="value" fill="#f59e0b" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -541,7 +541,7 @@ const TPMDowntimeAnalysis = () => (
       {/* Duration Wise */}
       <Card className="bg-white rounded-xl shadow">
         <CardContent>
-          <h4 className="font-semibold mb-3 text-gray-800">Duration Wise</h4>
+          <h4 className="font-bold mb-2 text-black text-center">Duration Wise</h4>
 
           <ResponsiveContainer width="100%" height={260}>
             <BarChart
@@ -549,9 +549,9 @@ const TPMDowntimeAnalysis = () => (
               layout="vertical" // ⭐ IMPORTANT
               margin={{ left: 20 }}
             >
-              <XAxis type="number" />
-              <YAxis type="category" dataKey="name" width={80} />
-              <Tooltip />
+              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+              <YAxis type="category" dataKey="name" width={80} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
+              <Tooltip contentStyle={{ color: 'black' }} />
               <Bar
                 dataKey="value"
                 fill="#60a5fa"
@@ -565,7 +565,7 @@ const TPMDowntimeAnalysis = () => (
       {/* Occurrence Wise */}
       <Card className="bg-white rounded-xl shadow">
         <CardContent>
-          <h4 className="font-semibold mb-3 text-gray-800">Occurrence Wise</h4>
+          <h4 className="font-bold mb-2 text-black text-center">Occurrence Wise</h4>
 
           <ResponsiveContainer width="100%" height={260}>
             <BarChart
@@ -573,9 +573,9 @@ const TPMDowntimeAnalysis = () => (
               layout="vertical" // ⭐ IMPORTANT
               margin={{ left: 20 }}
             >
-              <XAxis type="number" />
-              <YAxis type="category" dataKey="name" width={80} />
-              <Tooltip />
+              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
+              <YAxis type="category" dataKey="name" width={80} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
+              <Tooltip contentStyle={{ color: 'black' }} />
               <Bar dataKey="value" fill="#f59e0b" radius={[0, 6, 6, 0]} />
             </BarChart>
           </ResponsiveContainer>
