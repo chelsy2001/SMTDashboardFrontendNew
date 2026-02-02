@@ -588,7 +588,7 @@ const TPMDowntimeAnalysis = () => (
 const Assembly = () => {
   return (
     <DashboardLayout>
-      <div className="p-6 space-y-8 bg-gray-100 min-h-screen">
+      <div className="pl-6 pr-6 pb-6 space-y-8 bg-gray-100 min-h-screen">
         <FilterBar />
 
       <AssmblySelector onGroupChange={handleGroupChange} />
