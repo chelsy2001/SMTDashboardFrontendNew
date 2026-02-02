@@ -16,6 +16,9 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import Slider from "react-slick";
 import { LineChart, Line, CartesianGrid, Legend } from "recharts";
 import { TrendingUp, Target, Clock, CheckCircle, XCircle } from "lucide-react";
 /* ================== LOCAL CARD COMPONENT ================== */
@@ -316,46 +319,88 @@ const FilterBar = () => {
 };
 
 const LineSelector = () => {
-  const [activeLine, setActiveLine] = useState(1);
+  const [activeLine, setActiveLine] = useState(5);
+
+  const sliderSettings = {
+    dots: false,
+    infinite: false,
+    speed: 400,
+    slidesToShow: 6,
+    slidesToScroll: 1,
+    arrows: true,
+    nextArrow: <Arrow direction="right" />,
+    prevArrow: <Arrow direction="left" />,
+    responsive: [
+      { breakpoint: 1280, settings: { slidesToShow: 4 } },
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 2 } },
+      { breakpoint: 480, settings: { slidesToShow: 1 } },
+    ],
+  };
 
   return (
-    <div className="bg-white rounded-2xl shadow p-5">
+    <div className="bg-white rounded-2xl shadow px-10 py-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-gray-900 text-lg">Line Selection</h3>
-        <span className="text-sm text-gray-500">Select production line</span>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-semibold text-gray-900 text-lg">
+          Line Selection
+        </h3>
+        <span className="text-sm text-gray-500">
+          Select production line
+        </span>
       </div>
 
-      {/* Line Buttons */}
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        {Array.from({ length: 12 }).map((_, i) => {
-          const line = i + 1;
-          const isActive = activeLine === line;
+      {/* Slider */}
+      <div className="relative">
+        <Slider {...sliderSettings}>
+          {Array.from({ length: 12 }).map((_, i) => {
+            const line = i + 1;
+            const isActive = activeLine === line;
 
-          return (
-            <motion.button
-              key={line}
-              onClick={() => setActiveLine(line)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className={`
-                min-w-[120px] px-5 py-3 rounded-xl text-sm font-semibold transition-all
-                border
-                ${
-                  isActive
-                    ? "bg-blue-600 text-white border-blue-600 shadow-lg"
-                    : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
-                }
-              `}
-            >
-              Line {line}
-            </motion.button>
-          );
-        })}
+            return (
+              <div key={line} className="px-3">
+                <motion.button
+                  onClick={() => setActiveLine(line)}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  className={`
+                    w-full py-2.5 rounded-full text-sm font-semibold
+                    border transition-all duration-300
+                    ${
+                      isActive
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-transparent shadow-lg"
+                        : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-blue-50"
+                    }
+                  `}
+                >
+                  Line {line}
+                </motion.button>
+              </div>
+            );
+          })}
+        </Slider>
       </div>
     </div>
   );
 };
+const Arrow = ({ onClick, direction }) => (
+  <button
+    onClick={onClick}
+    className={`
+      absolute top-1/2 -translate-y-1/2 z-10
+      ${direction === "left" ? "-left-8" : "-right-9"}
+      w-10 h-10 rounded-full
+      bg-white shadow-md border border-gray-200
+      flex items-center justify-center
+      hover:bg-blue-50 transition
+    `}
+  >
+    <span className="text-blue-600 text-xl font-bold">
+      {direction === "left" ? "‹" : "›"}
+    </span>
+  </button>
+);
+
 
 const LineSummary = () => (
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
