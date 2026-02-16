@@ -10,6 +10,8 @@ import {
 } from "recharts";
 import DashboardLayout from "../partials/DashboardLayout";
 import { PieChart, Pie, Cell } from "recharts";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 
 /* ================== LOCAL CARD COMPONENT ================== */
@@ -38,48 +40,69 @@ const smtLines = Array.from({ length: 12 }, (_, i) => ({
 }));
 
 /* ================== COMPONENTS ================== */
-const FilterBar = () => {
-  const filters = ["Shift", "Day", "Week", "Month"];
+const FilterBar = ({
+  filterType,
+  setFilterType,
+  shift,
+  setShift,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+}) => {
+  const filters = ["SHIFT", "DAY", "WEEK", "MONTH"];
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow">
-      
-      {/* LEFT – Time Filters */}
-      <div className="flex gap-2">
-        {filters.map((f, i) => (
-          <button
-            key={f}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition
-              ${i === 0
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"}
-            `}
-          >
-            {f}
-          </button>
-        ))}
+
+      <div className="flex items-center gap-3">
+
+        <div className="flex gap-2">
+          {filters.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilterType(f.toUpperCase())}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition
+      ${filterType === f.toUpperCase()
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"}
+    `}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+
+        <select
+          value={shift}
+          onChange={(e) => setShift(e.target.value)}
+          className="px-3 py-2 rounded-lg text-sm border bg-gray-100"
+        >
+          <option value="">ALL</option>
+          <option value="A">Shift A</option>
+          <option value="B">Shift B</option>
+          <option value="C">Shift C</option>
+        </select>
       </div>
 
-      {/* RIGHT – Date Range */}
       <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border">
-        <span className="text-sm text-black font-medium">
-          Start Date:
-        </span>
+        <span className="text-sm font-medium">Start:</span>
         <input
           type="date"
-          className="px-2 py-1 text-sm rounded-md border"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
         />
-        <span className="text-sm text-black font-medium">
-          End Date:
-        </span>
+
         <input
           type="date"
-          className="px-2 py-1 text-sm rounded-md border"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
         />
       </div>
     </div>
   );
 };
+
 
 
 const MetricCard = ({ title, value }) => (
@@ -124,8 +147,8 @@ const TrendChart = ({
               </linearGradient>
             </defs>
 
-            <XAxis dataKey="time" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-            <YAxis domain={[0, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+            <XAxis dataKey="time" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+            <YAxis domain={[0, 100]} tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
             <Tooltip />
 
             <Area
@@ -199,8 +222,8 @@ const CircularChart = ({
   strokeWidth = 12,
 }) => {
   const getColor = (val) => {
-    if (val >= 90 ) return "#16a34a";
-    if (val >=75 && val < 90) return "#f59e0b";
+    if (val >= 90) return "#16a34a";
+    if (val >= 75 && val < 90) return "#f59e0b";
     return "#dc2626";
   };
 
@@ -252,93 +275,143 @@ const SectionHeader = ({ title }) => (
 
 /* ================== MAIN PAGE ================== */
 export default function SMTDashboard() {
-  
+  const BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
+
+  const [filterType, setFilterType] = useState("SHIFT");
+  const [shift, setShift] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const [smtData, setSmtData] = useState({
+    AvailabilityPct: 0,
+    PerformancePct: 0,
+    QualityPct: 0,
+    OEEPct: 0,
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const fetchPlantOEE = async () => {
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/Home/plant-smt-oee`,
+        {
+          params: {
+            filterType,
+            shift: shift || null,
+            startDate: startDate || null,
+            endDate: endDate || null,
+          },
+        }
+      );
+
+      if (response.data && response.data.length > 0) {
+        setSmtData(response.data[0]);
+      }
+
+    } catch (error) {
+      console.error("Error fetching SMT OEE:", error);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchPlantOEE();
+  }, [filterType, shift, startDate, endDate]);
+
+
   return (
     <DashboardLayout>
-    <div className="pl-6 pr-6 pb-6 space-y-8 bg-gray-100 min-h-screen">
+      <div className="pl-6 pr-6 pb-6 space-y-8 bg-gray-100 min-h-screen">
 
-      {/* Filters */}
-      <FilterBar />
+        {/* Filters */}
+        <FilterBar
+          filterType={filterType}
+          setFilterType={setFilterType}
+          shift={shift}
+          setShift={setShift}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
 
-     {/* SMT & Assembly Summary */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  {["SMT", "Assembly"].map((sec) => (
-    <Card key={sec} className="bg-white rounded-lg shadow">
-      <CardContent className="space-y-10">
-        <h2 className="text-lg font-bold text-black text-center">{sec} OEE Summary</h2>
+        {/* SMT & Assembly Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {["SMT", "Assembly"].map((sec) => (
+            <Card key={sec} className="bg-white rounded-lg shadow">
+              <CardContent className="space-y-10">
+                <h2 className="text-lg font-bold text-black text-center">{sec} OEE Summary</h2>
 
-        {/* OEE + A P Q */}
-<div className="flex items-center justify-between gap-2">
+                {/* OEE + A P Q */}
+                <div className="flex items-center justify-between gap-2">
 
-  {/* BIG OEE */}
-  <CircularChart
-    value={82}
-    label="OEE"
-    size={180}
-    strokeWidth={18}
-  />
-
-  {/* A P Q SMALL */}
-  <div className="flex gap-8">
-    <CircularChart value={18} label="A" size={110} />
-    <CircularChart value={45} label="P" size={110} />
-    <CircularChart value={92} label="Q" size={110} />
-  </div>
-
-</div>
+                  {/* BIG OEE */}
+                  <CircularChart value={Number(smtData.OEEPct || 0)} label="OEE" />
 
 
-        {/* Metrics */}
-        <div className="grid grid-cols-5 gap-3">
-          {/* <MetricCard title="Plan" value="1200" />
+                  {/* A P Q SMALL */}
+                  <div className="flex gap-8">
+                    <CircularChart value={Number(smtData.AvailabilityPct || 0)} label="A" />
+                    <CircularChart value={Number(smtData.PerformancePct || 0)} label="P" />
+                    <CircularChart value={Number(smtData.QualityPct || 0)} label="Q" />
+
+                  </div>
+
+                </div>
+
+
+                {/* Metrics */}
+                <div className="grid grid-cols-5 gap-3">
+                  {/* <MetricCard title="Plan" value="1200" />
           <MetricCard title="Actual" value="1100" />
           <MetricCard title="Downtime" value="45m" />
           <MetricCard title="Good" value="1050" />
           <MetricCard title="Bad" value="50" /> */}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </CardContent>
-    </Card>
-  ))}
-</div>
 
-      {/* SMT Trends */}
-<div className="space-y-4">
-  <SectionHeader title="SMT Trends" />
+        {/* SMT Trends */}
+        <div className="space-y-4">
+          <SectionHeader title="SMT Trends" />
 
-  <div className="gap-6">
-    {/* LIGHT OEE */}
-    <TrendChart
-      title="SMT OEE Trend"
-      color="#93c5fd"   // light blue
-      light
-    />
+          <div className="gap-6">
+            {/* LIGHT OEE */}
+            <TrendChart
+              title="SMT OEE Trend"
+              color="#93c5fd"   // light blue
+              light
+            />
 
-    <TrendChart title="Availability" color="#9b83b4" />
-    <TrendChart title="Performance" color="#acb5e0" />
-    <TrendChart title="Quality" color="#c52281" />
-  </div>
-</div>
+            <TrendChart title="Availability" color="#9b83b4" />
+            <TrendChart title="Performance" color="#acb5e0" />
+            <TrendChart title="Quality" color="#c52281" />
+          </div>
+        </div>
 
-{/* Assembly Trends */}
-<div className="space-y-4">
-  <SectionHeader title="Assembly Trends" />
+        {/* Assembly Trends */}
+        <div className="space-y-4">
+          <SectionHeader title="Assembly Trends" />
 
-  <div className="gap-6">
-    <TrendChart title="Assembly OEE Trend" color="#93a6ce" />
-    <TrendChart title="Availability" color="#9b83b4" />
-    <TrendChart title="Performance" color="#acb5e0" />
-    <TrendChart title="Quality" color="#c52281" />
-  </div>
-</div>
+          <div className="gap-6">
+            <TrendChart title="Assembly OEE Trend" color="#93a6ce" />
+            <TrendChart title="Availability" color="#9b83b4" />
+            <TrendChart title="Performance" color="#acb5e0" />
+            <TrendChart title="Quality" color="#c52281" />
+          </div>
+        </div>
 
 
-      {/* SMT Line OLE */}
-      <div className="flex items-center gap-3 mb-4">
- <SectionHeader title="SMT Line OLE" />
+        {/* SMT Line OLE */}
+        <div className="flex items-center gap-3 mb-4">
+          <SectionHeader title="SMT Line OLE" />
 
-</div>
-  <LineOLESection />
-    </div>
+        </div>
+        <LineOLESection />
+      </div>
     </DashboardLayout>
   );
 }
