@@ -172,12 +172,16 @@ const trendData = Array.from({ length: 8 }, (_, i) => ({
 
 /* ---------- Circular Chart ---------- */
 const CircularChart = ({ value, label, size = 120, strokeWidth = 12 }) => {
+  // const getColor = (val) => {
+  //   if (val >=75 ) return "#dc2626"; // red
+  //   if (val >= 76 && val <= 90) return "#f59e0b"; // yellow
+  //   return "#16a34a"; // green
+  // };
   const getColor = (val) => {
-    if (val < 20) return "#dc2626"; // red
-    if (val < 60) return "#f59e0b"; // yellow
-    return "#16a34a"; // green
+    if (val >= 90 ) return "#16a34a";
+    if (val >=75 && val < 90) return "#f59e0b";
+    return "#dc2626";
   };
-
   const color = getColor(value);
 
   const data = [
@@ -404,7 +408,7 @@ const downtimeData = [
 
 const M4DowntimeAnalysis = () => (
   <div className="space-y-4">
-    <SectionHeader title="M4 Downtime Analysis" />
+    <SectionHeader title="Station M4 Downtime Analysis" />
 
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Duration */}
@@ -442,7 +446,7 @@ const M4DowntimeAnalysis = () => (
 
 const TPMDowntimeAnalysis = () => (
   <div className="space-y-4">
-    <SectionHeader title="TPM Downtime Analysis" />
+    <SectionHeader title="Station TPM Downtime Analysis" />
 
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Duration Wise */}
@@ -521,7 +525,7 @@ const LinesStationPreformance = () => {
 
         {/* Line Trends */}
         <div className="space-y-4">
-          <SectionHeader title="Line Trends" />
+          <SectionHeader title="Station Trends" />
 
           <div className="gap-6">
             {/* LIGHT OEE */}
@@ -541,9 +545,9 @@ const LinesStationPreformance = () => {
 
         <TPMDowntimeAnalysis />
 
-        <SectionHeader title="Quality Planned vs Actual​" />
+        <SectionHeader title="Station Quality Planned vs Actual​" />
         <QualityHourlyChart />
-<SectionHeader title="Total Parts vs Rejection Part" />
+<SectionHeader title="Station Total Parts vs Rejection Part" />
         <QualityHourlyChart2 />
         <RejectionReason />
            

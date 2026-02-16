@@ -174,9 +174,9 @@ const trendData = Array.from({ length: 8 }, (_, i) => ({
 /* ---------- Circular Chart ---------- */
 const CircularChart = ({ value, label, size = 120, strokeWidth = 12 }) => {
   const getColor = (val) => {
-    if (val < 20) return "#dc2626"; // red
-    if (val < 60) return "#f59e0b"; // yellow
-    return "#16a34a"; // green
+    if (val >= 90 ) return "#16a34a";
+    if (val >=75 && val < 90) return "#f59e0b";
+    return "#dc2626";
   };
 
   const color = getColor(value);
@@ -405,7 +405,7 @@ const downtimeData = [
 
 const M4DowntimeAnalysis = () => (
   <div className="space-y-4">
-    <SectionHeader title="M4 Downtime Analysis" />
+    <SectionHeader title="Assembly Line M4 Downtime Analysis" />
 
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Duration */}
@@ -443,7 +443,7 @@ const M4DowntimeAnalysis = () => (
 
 const TPMDowntimeAnalysis = () => (
   <div className="space-y-4">
-    <SectionHeader title="TPM Downtime Analysis" />
+    <SectionHeader title="Assembly Line TPM Downtime Analysis" />
 
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Duration Wise */}
@@ -524,7 +524,7 @@ const AssemblyLinePreformance = () => {
 
         {/* Line Trends */}
         <div className="space-y-4">
-          <SectionHeader title="Line Trends" />
+          <SectionHeader title="Assembly Line Trends" />
 
           <div className="gap-6">
             {/* LIGHT OEE */}
@@ -544,9 +544,9 @@ const AssemblyLinePreformance = () => {
 
         <TPMDowntimeAnalysis />
 
-        <SectionHeader title="Quality Planned vs Actual​" />
+        <SectionHeader title="Assembly Line Quality Planned vs Actual​" />
         <QualityHourlyChart />
-<SectionHeader title="Total Parts vs Rejection Part" />
+<SectionHeader title="Assembly Line Total Parts vs Rejection Part" />
         <QualityHourlyChart2 />
         <RejectionReason />
            

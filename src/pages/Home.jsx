@@ -199,10 +199,11 @@ const CircularChart = ({
   strokeWidth = 12,
 }) => {
   const getColor = (val) => {
-    if (val < 20) return "#dc2626";     // red
-    if (val < 60) return "#f59e0b";     // yellow
-    return "#16a34a";                   // green
+    if (val >= 90 ) return "#16a34a";
+    if (val >=75 && val < 90) return "#f59e0b";
+    return "#dc2626";
   };
+
 
   const color = getColor(value);
 
