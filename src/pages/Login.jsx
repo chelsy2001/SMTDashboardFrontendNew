@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react"
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
-import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { fetchUsername, login } from "../services/operations/authAPI.jsx"
+import axios from "axios"
 import warehouseImg from "../assets/images/loginBackground1.png"
 
 const Login = () => {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+const BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL
 
   const [formData, setFormData] = useState({
     username: "",
@@ -16,26 +15,68 @@ const Login = () => {
 
   const [showPassword, setShowPassword] = useState(false)
   const [usernames, setUsernames] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const { username, password } = formData
 
+  /* ===============================
+     FETCH USERNAME LIST
+  =============================== */
   useEffect(() => {
     const getUsernames = async () => {
-      const response = await fetchUsername()()
-      if (Array.isArray(response?.data)) {
-        setUsernames(response.data)
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/login/username`
+        )
+
+        if (Array.isArray(response?.data)) {
+          setUsernames(response.data)
+        }
+      } catch (error) {
+        console.error("Error fetching usernames:", error)
       }
     }
+
     getUsernames()
   }, [])
 
+  /* ===============================
+     HANDLE INPUT CHANGE
+  =============================== */
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  /* ===============================
+     LOGIN API CALL
+  =============================== */
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    dispatch(login(username, password, navigate))
+    setLoading(true)
+
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/login/Userlogin`,
+        {
+          username,
+          password,
+        }
+      )
+
+      if (response?.data) {
+        console.log("Login Success:", response.data)
+
+        // Save user data (optional)
+        localStorage.setItem("user", JSON.stringify(response.data))
+
+        navigate("/Home") // change if needed
+      }
+    } catch (error) {
+      console.error("Login failed:", error)
+      alert("Invalid Username or Password")
+    }
+
+    setLoading(false)
   }
 
   return (
@@ -62,6 +103,7 @@ const Login = () => {
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              
               {/* Username */}
               <div>
                 <label className="text-sm font-medium text-gray-700">
@@ -114,10 +156,12 @@ const Login = () => {
               {/* Button */}
               <button
                 type="submit"
-                className="w-full bg-[#6B8F8A] text-white py-3 rounded-md font-medium hover:bg-[#5A7C77] transition"
+                disabled={loading}
+                className="w-full bg-[#6B8F8A] text-white py-3 rounded-md font-medium hover:bg-[#5A7C77] transition disabled:opacity-50"
               >
-                Login
+                {loading ? "Logging in..." : "Login"}
               </button>
+
             </form>
           </div>
         </div>
