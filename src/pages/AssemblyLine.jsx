@@ -1,6 +1,7 @@
 import { React, useState } from "react";
 import DashboardLayout from "../partials/DashboardLayout";
-
+import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import {
@@ -18,21 +19,14 @@ import {
 } from "recharts";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useNavigate } from "react-router-dom";
-
+import { Factory } from "lucide-react";
 import Slider from "react-slick";
 import { LineChart, Line, CartesianGrid, Legend } from "recharts";
 import { TrendingUp, Target, Clock, CheckCircle, XCircle } from "lucide-react";
 /* ================== LOCAL CARD COMPONENT ================== */
-const Card = ({ children, className = "", ...props }) => (
-  <div
-    className={`rounded-xl shadow ${className}`}
-    {...props}
-  >
-    {children}
-  </div>
+const Card = ({ children, className = "" }) => (
+  <div className={`  rounded-xl shadow ${className}`}>{children}</div>
 );
-
 const qualityHourlyData = [
   { hour: "08", expected: 95, actual: 92 },
   { hour: "09", expected: 95, actual: 90 },
@@ -359,88 +353,8 @@ const FilterBar = () => {
   );
 };
 
-const LineSelector = () => {
-  const [activeLine, setActiveLine] = useState(5);
 
-  const sliderSettings = {
-    dots: false,
-    infinite: false,
-    speed: 400,
-    slidesToShow: 6,
-    slidesToScroll: 1,
-    arrows: true,
-    nextArrow: <Arrow direction="right" />,
-    prevArrow: <Arrow direction="left" />,
-    responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: 4 } },
-      { breakpoint: 1024, settings: { slidesToShow: 3 } },
-      { breakpoint: 768, settings: { slidesToShow: 2 } },
-      { breakpoint: 480, settings: { slidesToShow: 1 } },
-    ],
-  };
-
-  return (
-    <div className="bg-white rounded-2xl shadow px-10 py-4">
-      {/* Header */}
-      <div className=" text-center mb-4">
-        <h3 className="font-semibold text-black text-lg text-center">
-          Line Selection
-        </h3>
-      </div>
-
-      {/* Slider */}
-      <div className="relative">
-        <Slider {...sliderSettings}>
-          {Array.from({ length: 12 }).map((_, i) => {
-            const line = i + 1;
-            const isActive = activeLine === line;
-
-            return (
-              <div key={line} className="px-3">
-                <motion.button
-                  onClick={() => setActiveLine(line)}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
-                  className={`
-                    w-full py-2.5 rounded-full text-sm font-semibold
-                    border transition-all duration-300
-                    ${
-                      isActive
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-transparent shadow-lg"
-                        : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-blue-50"
-                    }
-                  `}
-                >
-                  Line {line}
-                </motion.button>
-              </div>
-            );
-          })}
-        </Slider>
-      </div>
-    </div>
-  );
-};
-const Arrow = ({ onClick, direction }) => (
-  <button
-    onClick={onClick}
-    className={`
-      absolute top-1/2 -translate-y-1/2 z-10
-      ${direction === "left" ? "-left-8" : "-right-9"}
-      w-10 h-10 rounded-full
-      bg-white shadow-md border border-gray-200
-      flex items-center justify-center
-      hover:bg-blue-50 transition
-    `}
-  >
-    <span className="text-blue-600 text-xl font-bold">
-      {direction === "left" ? "‹" : "›"}
-    </span>
-  </button>
-);
-
-
-const LineSummary = () => (
+const StationSummary = () => (
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
     {/* LEFT – OEE + APQ */}
     <Card className="bg-white rounded-xl shadow">
@@ -480,48 +394,6 @@ const LineSummary = () => (
   </div>
 );
 
-const StationCards = () => {
-  const navigate = useNavigate();
-
-  return (
-    <div className="space-y-4">
-      <SectionHeader title="Stations" />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-5">
-        {Array.from({ length: 8 }).map((_, i) => {
-          const stationName = `Station ${i + 1}`;
-
-          return (
-            <Card
-              key={i}
-              className="bg-white rounded-lg shadow cursor-pointer hover:shadow-lg transition"
-              onClick={() =>
-  navigate("/LinesStationPreformance", {
-    state: { stationName },
-  })
-}
-            >
-              <CardContent className="space-y-2">
-                <p className="font-bold text-black text-m text-center">
-                  {stationName}
-                </p>
-
-                <KpiBar
-                  label="OEE"
-                  value={70 + Math.random() * 20}
-                  color="#2563eb"
-                />
-                <KpiBar label="A" value={65 + Math.random() * 20} color="#16a34a" />
-                <KpiBar label="P" value={60 + Math.random() * 20} color="#f59e0b" />
-                <KpiBar label="Q" value={85 + Math.random() * 10} color="#22c55e" />
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
 
 
 const downtimeData = [
@@ -621,15 +493,34 @@ const TPMDowntimeAnalysis = () => (
   </div>
 );
 
-const LinesPreformance = () => {
+const AssemblyLinePreformance = () => {
+
+    const location = useLocation();
+  const AssemblyLineName = location.state?.AssemblyLineName;
+
+
   return (
     <DashboardLayout>
       <div className="pl-6 pr-6 pb-6 space-y-8 bg-gray-100 min-h-screen">
         <FilterBar />
 
-        <LineSelector />
+ <div className="flex justify-center mb-6">
+  <div className="flex items-center gap-4 bg-white px-8 py-4 rounded-2xl shadow-md border border-gray-100">
+    <div className="bg-blue-100 p-3 rounded-xl">
+      <Factory className="text-blue-600 w-6 h-6" />
+    </div>
 
-        <LineSummary />
+    <div>
+      <h2 className="text-2xl font-bold text-gray-800">
+        {AssemblyLineName}
+      </h2>
+    </div>
+  </div>
+</div>
+
+
+
+        <StationSummary />
 
         {/* Line Trends */}
         <div className="space-y-4">
@@ -649,8 +540,6 @@ const LinesPreformance = () => {
           </div>
         </div>
 
-     
-
         <M4DowntimeAnalysis />
 
         <TPMDowntimeAnalysis />
@@ -660,12 +549,10 @@ const LinesPreformance = () => {
 <SectionHeader title="Total Parts vs Rejection Part" />
         <QualityHourlyChart2 />
         <RejectionReason />
-
-           <StationCards/>
-
+           
       </div>
     </DashboardLayout>
   );
 };
 
-export default LinesPreformance;
+export default AssemblyLinePreformance;

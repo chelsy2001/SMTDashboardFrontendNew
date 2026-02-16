@@ -289,11 +289,11 @@ export default function SMTDashboard() {
 
         {/* Metrics */}
         <div className="grid grid-cols-5 gap-3">
-          <MetricCard title="Plan" value="1200" />
+          {/* <MetricCard title="Plan" value="1200" />
           <MetricCard title="Actual" value="1100" />
           <MetricCard title="Downtime" value="45m" />
           <MetricCard title="Good" value="1050" />
-          <MetricCard title="Bad" value="50" />
+          <MetricCard title="Bad" value="50" /> */}
         </div>
       </CardContent>
     </Card>

@@ -9,7 +9,8 @@ import Quality from "../pages/Quality.jsx";
 import Login from "../pages/Login.jsx";
 import Home from "../pages/Home.jsx";
 import Error from "../pages/Error.jsx";
-
+import LinesStationPreformance from "../pages/LinesStationPreformance.jsx";
+import AssemblyLinePreformance from "../pages/AssemblyLine.jsx";
 
 export default function AppRoutes() {
   return (
@@ -53,14 +54,22 @@ export default function AppRoutes() {
         }
       />
 
-      {/* <Route
-        path="/CycleTime"
-        element={
-          <PrivateRoute>
-            <CycleTime />
-          </PrivateRoute>
-        }
-      /> */}
+      <Route
+  path="/LinesStationPreformance"
+  element={
+    <PrivateRoute>
+      <LinesStationPreformance />
+    </PrivateRoute>
+  }
+/>
+ <Route
+  path="/AssemblyLinePreformance"
+  element={
+    <PrivateRoute>
+      <AssemblyLinePreformance />
+    </PrivateRoute>
+  }
+/>
 
       <Route
         path="/Quality"
