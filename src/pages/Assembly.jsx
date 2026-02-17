@@ -1,31 +1,19 @@
-import { React, useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardLayout from "../partials/DashboardLayout";
-
 import { motion } from "framer-motion";
+import axios from "axios";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { useNavigate } from "react-router-dom";
 
-
+/* ================== UI COMPONENTS ================== */
 const Card = ({ children, className = "", ...props }) => (
-  <div
-    className={`rounded-xl shadow ${className}`}
-    {...props}
-  >
+  <div className={`rounded-xl shadow ${className}`} {...props}>
     {children}
   </div>
 );
-
-
-const assemblyGroups = [
-  { id: 1, label: "1 – 25", start: 1, end: 25 },
-  { id: 2, label: "25 – 50", start: 25, end: 50 },
-  { id: 3, label: "50 – 75", start: 50, end: 75 },
-  { id: 4, label: "75 – 100", start: 75, end: 100 },
-];
-
 
 const CardContent = ({ children, className = "" }) => (
   <div className={`p-4 ${className}`}>{children}</div>
@@ -35,7 +23,7 @@ const KpiBar = ({ label, value, color }) => (
   <div>
     <div className="flex justify-between text-xs mb-1">
       <span className="text-black font-medium">{label}</span>
-      <span className="font-semibold text-black">{value.toFixed(1)}%</span>
+      <span className="font-semibold text-black">{Number(value).toFixed(1)}%</span>
     </div>
     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
       <motion.div
@@ -48,44 +36,105 @@ const KpiBar = ({ label, value, color }) => (
     </div>
   </div>
 );
-/* ================== COMPONENTS ================== */
-const FilterBar = () => {
-  const filters = ["Shift", "Day", "Week", "Month"];
+
+/* ================== GROUPS ================== */
+const assemblyGroups = [
+  { id: 1, label: "1 – 25" },
+  { id: 2, label: "25 – 50" },
+  { id: 3, label: "50 – 75" },
+  { id: 4, label: "75 – 100" },
+];
+
+/* ================== FILTER BAR ================== */
+const FilterBar = ({
+  filterType,
+  setFilterType,
+  shift,
+  setShift,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+}) => {
+  const filters = ["SHIFT", "DAY", "WEEK", "MONTH"];
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow">
-      {/* LEFT – Time Filters */}
-      <div className="flex gap-2">
-        {filters.map((f, i) => (
-          <button
-            key={f}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition
-              ${
-                i === 0
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }
-            `}
-          >
-            {f}
-          </button>
-        ))}
+      {/* LEFT */}
+      <div className="flex items-center gap-3">
+        <div className="flex gap-2">
+          {filters.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilterType(f)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition
+                ${
+                  filterType === f
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }
+              `}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+
+        {/* Shift Dropdown */}
+        <select
+          value={shift}
+          onChange={(e) => setShift(e.target.value)}
+          className="px-3 py-2 rounded-lg text-sm border bg-gray-100 w-28"
+        >
+          <option value="">ALL</option>
+          <option value="A">Shift A</option>
+          <option value="B">Shift B</option>
+          <option value="C">Shift C</option>
+        </select>
       </div>
 
-      {/* RIGHT – Date Range */}
+      {/* RIGHT */}
       <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border">
         <span className="text-sm text-black font-medium">Start Date:</span>
-        <input type="date" className="px-2 py-1 text-sm rounded-md border" />
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="px-2 py-1 text-sm rounded-md border"
+        />
+
         <span className="text-sm text-black font-medium">End Date:</span>
-        <input type="date" className="px-2 py-1 text-sm rounded-md border" />
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="px-2 py-1 text-sm rounded-md border"
+        />
       </div>
     </div>
   );
 };
 
-const AssmblySelector = ({ onGroupChange }) => {
-  const [activeGroup, setActiveGroup] = useState(1);
+/* ================== GROUP SELECTOR ================== */
+const Arrow = ({ onClick, direction }) => (
+  <button
+    onClick={onClick}
+    className={`
+      absolute top-1/2 -translate-y-1/2 z-10
+      ${direction === "left" ? "-left-8" : "-right-9"}
+      w-10 h-10 rounded-full
+      bg-white shadow-md border border-gray-200
+      flex items-center justify-center
+      hover:bg-blue-50 transition
+    `}
+  >
+    <span className="text-blue-600 text-xl font-bold">
+      {direction === "left" ? "‹" : "›"}
+    </span>
+  </button>
+);
 
+const AssmblySelector = ({ activeGroup, setActiveGroup }) => {
   const sliderSettings = {
     dots: false,
     infinite: false,
@@ -102,23 +151,12 @@ const AssmblySelector = ({ onGroupChange }) => {
     ],
   };
 
-  const handleSelect = (group) => {
-    setActiveGroup(group.id);
-
-    // 👇 yahan se selected group ka data load kara sakte ho
-    onGroupChange?.(group);
-  };
-
   return (
     <div className="bg-white rounded-2xl shadow px-10 py-4">
-      {/* Header */}
       <div className="text-center mb-4">
-        <h3 className="font-semibold text-gray-900 text-lg">
-          Assembly Groups
-        </h3>
+        <h3 className="font-semibold text-gray-900 text-lg">Assembly Groups</h3>
       </div>
 
-      {/* Slider */}
       <div className="relative">
         <Slider {...sliderSettings}>
           {assemblyGroups.map((group) => {
@@ -127,7 +165,7 @@ const AssmblySelector = ({ onGroupChange }) => {
             return (
               <div key={group.id} className="px-3">
                 <motion.button
-                  onClick={() => handleSelect(group)}
+                  onClick={() => setActiveGroup(group.id)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className={`
@@ -150,64 +188,36 @@ const AssmblySelector = ({ onGroupChange }) => {
     </div>
   );
 };
-const handleGroupChange = (group) => {
-  console.log("Selected Assembly Group:", group);
-  // example:
-  // fetchData(group.start, group.end)
-};
 
-const Arrow = ({ onClick, direction }) => (
-  <button
-    onClick={onClick}
-    className={`
-      absolute top-1/2 -translate-y-1/2 z-10
-      ${direction === "left" ? "-left-8" : "-right-9"}
-      w-10 h-10 rounded-full
-      bg-white shadow-md border border-gray-200
-      flex items-center justify-center
-      hover:bg-blue-50 transition
-    `}
-  >
-    <span className="text-blue-600 text-xl font-bold">
-      {direction === "left" ? "‹" : "›"}
-    </span>
-  </button>
-);
-
-
-const AssemblyLineCard = () => {
+/* ================== LINE CARDS ================== */
+const AssemblyLineCard = ({ lines }) => {
   const navigate = useNavigate();
 
   return (
     <div className="space-y-4">
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-        {Array.from({ length: 25 }).map((_, i) => {
-          const AssemblyLineName = `AssemblyLineName ${i + 1}`;
+        {lines.map((line) => {
+          const lineName = `Line ${line.LineID}`;
 
           return (
             <Card
-              key={i}
+              key={line.LineID}
               className="bg-white rounded-lg shadow cursor-pointer hover:shadow-lg transition"
               onClick={() =>
-  navigate("/AssemblyLinePreformance", {
-    state: { AssemblyLineName },
-  })
-}
+                navigate("/AssemblyLinePreformance", {
+                  state: { lineID: line.LineID, lineName },
+                })
+              }
             >
               <CardContent className="space-y-2">
                 <p className="font-bold text-black text-m text-center">
-                  {AssemblyLineName}
+                  {lineName}
                 </p>
 
-                <KpiBar
-                  label="OEE"
-                  value={70 + Math.random() * 20}
-                  color="#2563eb"
-                />
-                <KpiBar label="A" value={65 + Math.random() * 20} color="#16a34a" />
-                <KpiBar label="P" value={60 + Math.random() * 20} color="#f59e0b" />
-                <KpiBar label="Q" value={85 + Math.random() * 10} color="#22c55e" />
+                <KpiBar label="OEE" value={line.OEE} color="#2563eb" />
+                <KpiBar label="A" value={line.Availability} color="#16a34a" />
+                <KpiBar label="P" value={line.Performance} color="#f59e0b" />
+                <KpiBar label="Q" value={line.Quality} color="#22c55e" />
               </CardContent>
             </Card>
           );
@@ -217,19 +227,83 @@ const AssemblyLineCard = () => {
   );
 };
 
-const Assembly = () => {
+/* ================== MAIN PAGE ================== */
+export default function Assembly() {
+  const BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
+
+  const [filterType, setFilterType] = useState("SHIFT");
+  const [shift, setShift] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const [activeGroup, setActiveGroup] = useState(1);
+  const [linesData, setLinesData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchAssemblyGroupData = async () => {
+    try {
+      setLoading(true);
+
+      // If user selected date range, force filterType = DATERANGE
+      const apiFilterType =
+        startDate && endDate ? "DATERANGE" : filterType;
+
+      const response = await axios.get(
+        `${BASE_URL}/AssemblyHome/assembly-group-oee-apq`,
+        {
+          params: {
+            filterType: apiFilterType,
+            groupNo: activeGroup,
+            shift: shift || null,
+            startDate: startDate || null,
+            endDate: endDate || null,
+          },
+        }
+      );
+
+      setLinesData(response.data || []);
+    } catch (error) {
+      console.error("Error fetching assembly group data:", error);
+      setLinesData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAssemblyGroupData();
+  }, [filterType, shift, startDate, endDate, activeGroup]);
+
   return (
     <DashboardLayout>
       <div className="pl-6 pr-6 pb-6 space-y-8 bg-gray-100 min-h-screen">
-        <FilterBar />
+        {/* Filters */}
+        <FilterBar
+          filterType={filterType}
+          setFilterType={setFilterType}
+          shift={shift}
+          setShift={setShift}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
 
-      <AssmblySelector onGroupChange={handleGroupChange} />
+        {/* Group Selector */}
+        <AssmblySelector
+          activeGroup={activeGroup}
+          setActiveGroup={setActiveGroup}
+        />
 
-        <AssemblyLineCard />
-
+        {/* Cards */}
+        {loading ? (
+          <div className="text-center text-black font-semibold">
+            Loading...
+          </div>
+        ) : (
+          <AssemblyLineCard lines={linesData} />
+        )}
       </div>
     </DashboardLayout>
   );
-};
-
-export default Assembly
+}
