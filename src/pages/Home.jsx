@@ -69,7 +69,7 @@ const FilterBar = ({
         <select
           value={shift}
           onChange={(e) => setShift(e.target.value)}
-          className="px-3 py-2 rounded-lg text-sm border bg-gray-100"
+          className="px-3 py-2 rounded-lg text-sm border bg-gray-100 w-25"
         >
           <option value="">ALL</option>
           <option value="A">Shift A</option>
@@ -98,16 +98,16 @@ const FilterBar = ({
 
 
 
-const MetricCard = ({ title, value }) => (
-  <motion.div whileHover={{ scale: 1.05 }}>
-    <Card className="flex items-center justify-center bg-blue-50 outline rounded-lg shadow color-black">
-      <CardContent className="text-center">
-        <p className="text-m text-black font-semibold">{title}</p>
-        <p className=" text-lg text-black">{value}</p>
-      </CardContent>
-    </Card>
-  </motion.div>
-);
+// const MetricCard = ({ title, value }) => (
+//   <motion.div whileHover={{ scale: 1.05 }}>
+//     <Card className="flex items-center justify-center bg-blue-50 outline rounded-lg shadow color-black">
+//       <CardContent className="text-center">
+//         <p className="text-m text-black font-semibold">{title}</p>
+//         <p className=" text-lg text-black">{value}</p>
+//       </CardContent>
+//     </Card>
+//   </motion.div>
+// );
 
 const TrendChart = ({
   title,
@@ -193,7 +193,7 @@ const LineOLESection = ({ data = [] }) => (
             {/* Line Header */}
             <div className="flex items-center justify-between">
               <p className="font-semibold text-gray-800">
-                 {l.LineName}
+                {l.LineName}
               </p>
               <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
                 SMT
@@ -281,8 +281,8 @@ export default function SMTDashboard() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [trendData, setTrendData] = useState([]);
-const [assemblyTrendData, setAssemblyTrendData] = useState([]);
-const [lineWiseData, setLineWiseData] = useState([]);
+  const [assemblyTrendData, setAssemblyTrendData] = useState([]);
+  const [lineWiseData, setLineWiseData] = useState([]);
 
   const [smtData, setSmtData] = useState({
     AvailabilityPct: 0,
@@ -418,65 +418,65 @@ const [lineWiseData, setLineWiseData] = useState([]);
     };
   });
 
-const fetchAssemblyTrend = async () => {
-  try {
-    const trendFilterType = startDate && endDate ? "DATERANGE" : filterType;
+  const fetchAssemblyTrend = async () => {
+    try {
+      const trendFilterType = startDate && endDate ? "DATERANGE" : filterType;
 
-    const response = await axios.get(
-      `${BASE_URL}/Home/plant-assemblyLine-apq-oee-trend`,
-      {
-        params: {
-          filterType: trendFilterType,
-          shift: shift || null,
-          startDate: startDate || null,
-          endDate: endDate || null,
-        },
-      }
-    );
+      const response = await axios.get(
+        `${BASE_URL}/Home/plant-assemblyLine-apq-oee-trend`,
+        {
+          params: {
+            filterType: trendFilterType,
+            shift: shift || null,
+            startDate: startDate || null,
+            endDate: endDate || null,
+          },
+        }
+      );
 
-    setAssemblyTrendData(response.data || []);
-  } catch (error) {
-    console.error("Error fetching Assembly Trend:", error);
-  }
-};
-const formattedAssemblyTrendData = assemblyTrendData.map((row) => {
-  if (trendMode === "Hourly") {
+      setAssemblyTrendData(response.data || []);
+    } catch (error) {
+      console.error("Error fetching Assembly Trend:", error);
+    }
+  };
+  const formattedAssemblyTrendData = assemblyTrendData.map((row) => {
+    if (trendMode === "Hourly") {
+      return {
+        label: formatHourLabelFromUTCString(row.TimeStamp),
+        OEE: Number(row.OEE || 0),
+        Availability: Number(row.Availability || 0),
+        Performance: Number(row.Performance || 0),
+        Quality: Number(row.Quality || 0),
+      };
+    }
+
     return {
-      label: formatHourLabelFromUTCString(row.TimeStamp),
+      label: formatDateLabel(row.ProdDate),
       OEE: Number(row.OEE || 0),
       Availability: Number(row.Availability || 0),
       Performance: Number(row.Performance || 0),
       Quality: Number(row.Quality || 0),
     };
-  }
+  });
 
-  return {
-    label: formatDateLabel(row.ProdDate),
-    OEE: Number(row.OEE || 0),
-    Availability: Number(row.Availability || 0),
-    Performance: Number(row.Performance || 0),
-    Quality: Number(row.Quality || 0),
+  const fetchLineWiseOLE = async () => {
+    try {
+      const lineFilterType = startDate && endDate ? "DATERANGE" : filterType;
+
+      const response = await axios.get(`${BASE_URL}/Home/LineWise-apq-ole`, {
+        params: {
+          filterType: lineFilterType,
+          shift: shift || null,
+          startDate: startDate || null,
+          endDate: endDate || null,
+        },
+      });
+
+      setLineWiseData(response.data || []);
+    } catch (error) {
+      console.error("Error fetching LineWise OLE:", error);
+    }
   };
-});
-
-const fetchLineWiseOLE = async () => {
-  try {
-    const lineFilterType = startDate && endDate ? "DATERANGE" : filterType;
-
-    const response = await axios.get(`${BASE_URL}/Home/LineWise-apq-ole`, {
-      params: {
-        filterType: lineFilterType,
-        shift: shift || null,
-        startDate: startDate || null,
-        endDate: endDate || null,
-      },
-    });
-
-    setLineWiseData(response.data || []);
-  } catch (error) {
-    console.error("Error fetching LineWise OLE:", error);
-  }
-};
 
 
 
@@ -486,8 +486,8 @@ const fetchLineWiseOLE = async () => {
     fetchPlantOEE();
     fetchPlantAssemblyOEE();
     fetchPlantTrend();
-      fetchAssemblyTrend();
-      fetchLineWiseOLE();
+    fetchAssemblyTrend();
+    fetchLineWiseOLE();
   }, [filterType, shift, startDate, endDate]);
 
   return (
@@ -509,18 +509,18 @@ const fetchLineWiseOLE = async () => {
         {/* SMT & Assembly Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="bg-white rounded-lg shadow">
-            <CardContent className="space-y-8 min-h-[230px] flex flex-col justify-center">
+            <CardContent className="space-y-8 min-h-[290px] flex flex-col justify-center">
               <h2 className="text-lg font-bold text-black text-center">
                 SMT OEE Summary
               </h2>
 
               <div className="flex items-center justify-between gap-2">
-                <CircularChart value={Number(smtData.OEEPct || 0)} label="OEE" />
+                <CircularChart value={Number(smtData.OEEPct || 0)} label="OEE"  size={180} strokeWidth={18}  />
 
                 <div className="flex gap-8">
-                  <CircularChart value={Number(smtData.AvailabilityPct || 0)} label="A" />
-                  <CircularChart value={Number(smtData.PerformancePct || 0)} label="P" />
-                  <CircularChart value={Number(smtData.QualityPct || 0)} label="Q" />
+                  <CircularChart value={Number(smtData.AvailabilityPct || 0)} label="A" size={110}/>
+                  <CircularChart value={Number(smtData.PerformancePct || 0)} label="P" size={110}/>
+                  <CircularChart value={Number(smtData.QualityPct || 0)} label="Q" size={110}/>
                 </div>
               </div>
             </CardContent>
@@ -528,18 +528,18 @@ const fetchLineWiseOLE = async () => {
 
           {/* Assembly Summary */}
           <Card className="bg-white rounded-lg shadow">
-            <CardContent className="space-y-10">
+            <CardContent className="space-y-8 min-h-[290px] flex flex-col justify-center">
               <h2 className="text-lg font-bold text-black text-center">
                 Assembly OEE Summary
               </h2>
 
               <div className="flex items-center justify-between gap-2">
-                <CircularChart value={Number(assemblyData.OEEPct || 0)} label="OEE" />
+                <CircularChart value={Number(assemblyData.OEEPct || 0)} label="OEE" size={180} strokeWidth={18}/>
 
                 <div className="flex gap-8">
-                  <CircularChart value={Number(assemblyData.AvailabilityPct || 0)} label="A" />
-                  <CircularChart value={Number(assemblyData.PerformancePct || 0)} label="P" />
-                  <CircularChart value={Number(assemblyData.QualityPct || 0)} label="Q" />
+                  <CircularChart value={Number(assemblyData.AvailabilityPct || 0)} label="A" size={110}/>
+                  <CircularChart value={Number(assemblyData.PerformancePct || 0)} label="P" size={110} />
+                  <CircularChart value={Number(assemblyData.QualityPct || 0)} label="Q" size={110}/>
                 </div>
               </div>
             </CardContent>
@@ -588,36 +588,36 @@ const fetchLineWiseOLE = async () => {
         <div className="space-y-4">
           <SectionHeader title="Assembly Trends" />
 
-    <div className="gap-6">
-    <TrendChart
-      title="Assembly OEE Trend"
-      data={formattedAssemblyTrendData}
-      dataKey="OEE"
-      color="#93a6ce"
-      light
-    />
+          <div className="gap-6">
+            <TrendChart
+              title="Assembly OEE Trend"
+              data={formattedAssemblyTrendData}
+              dataKey="OEE"
+              color="#93a6ce"
+              light
+            />
 
-    <TrendChart
-      title="Availability"
-      data={formattedAssemblyTrendData}
-      dataKey="Availability"
-      color="#9b83b4"
-    />
+            <TrendChart
+              title="Availability"
+              data={formattedAssemblyTrendData}
+              dataKey="Availability"
+              color="#9b83b4"
+            />
 
-    <TrendChart
-      title="Performance"
-      data={formattedAssemblyTrendData}
-      dataKey="Performance"
-      color="#acb5e0"
-    />
+            <TrendChart
+              title="Performance"
+              data={formattedAssemblyTrendData}
+              dataKey="Performance"
+              color="#acb5e0"
+            />
 
-    <TrendChart
-      title="Quality"
-      data={formattedAssemblyTrendData}
-      dataKey="Quality"
-      color="#c52281"
-    />
-  </div>
+            <TrendChart
+              title="Quality"
+              data={formattedAssemblyTrendData}
+              dataKey="Quality"
+              color="#c52281"
+            />
+          </div>
         </div>
 
 
@@ -626,7 +626,7 @@ const fetchLineWiseOLE = async () => {
           <SectionHeader title="SMT Line OLE" />
 
         </div>
-       <LineOLESection data={lineWiseData} />
+        <LineOLESection data={lineWiseData} />
 
       </div>
     </DashboardLayout>
