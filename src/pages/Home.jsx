@@ -288,6 +288,12 @@ export default function SMTDashboard() {
     QualityPct: 0,
     OEEPct: 0,
   });
+  const [assemblyData, setAssemblyData] = useState({
+    AvailabilityPct: 0,
+    PerformancePct: 0,
+    QualityPct: 0,
+    OEEPct: 0,
+  });
 
   const [loading, setLoading] = useState(false);
 
@@ -314,9 +320,31 @@ export default function SMTDashboard() {
     }
   };
 
+  const fetchPlantAssemblyOEE = async () => {
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/Home/plant-assembly-oee`,
+        {
+          params: {
+            filterType,
+            shift: shift || null,
+            startDate: startDate || null,
+            endDate: endDate || null,
+          },
+        }
+      );
+
+      if (response.data && response.data.length > 0) {
+        setAssemblyData(response.data[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching Assembly OEE:", error);
+    }
+  };
 
   useEffect(() => {
     fetchPlantOEE();
+    fetchPlantAssemblyOEE();
   }, [filterType, shift, startDate, endDate]);
 
 
@@ -338,40 +366,43 @@ export default function SMTDashboard() {
 
         {/* SMT & Assembly Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {["SMT", "Assembly"].map((sec) => (
-            <Card key={sec} className="bg-white rounded-lg shadow">
-              <CardContent className="space-y-10">
-                <h2 className="text-lg font-bold text-black text-center">{sec} OEE Summary</h2>
+          <Card className="bg-white rounded-lg shadow">
+            <CardContent className="space-y-8 min-h-[230px] flex flex-col justify-center">
+              <h2 className="text-lg font-bold text-black text-center">
+                SMT OEE Summary
+              </h2>
 
-                {/* OEE + A P Q */}
-                <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <CircularChart value={Number(smtData.OEEPct || 0)} label="OEE" />
 
-                  {/* BIG OEE */}
-                  <CircularChart value={Number(smtData.OEEPct || 0)} label="OEE" />
-
-
-                  {/* A P Q SMALL */}
-                  <div className="flex gap-8">
-                    <CircularChart value={Number(smtData.AvailabilityPct || 0)} label="A" />
-                    <CircularChart value={Number(smtData.PerformancePct || 0)} label="P" />
-                    <CircularChart value={Number(smtData.QualityPct || 0)} label="Q" />
-
-                  </div>
-
+                <div className="flex gap-8">
+                  <CircularChart value={Number(smtData.AvailabilityPct || 0)} label="A" />
+                  <CircularChart value={Number(smtData.PerformancePct || 0)} label="P" />
+                  <CircularChart value={Number(smtData.QualityPct || 0)} label="Q" />
                 </div>
+              </div>
+            </CardContent>
+          </Card>
 
+          {/* Assembly Summary */}
+          <Card className="bg-white rounded-lg shadow">
+            <CardContent className="space-y-10">
+              <h2 className="text-lg font-bold text-black text-center">
+                Assembly OEE Summary
+              </h2>
 
-                {/* Metrics */}
-                <div className="grid grid-cols-5 gap-3">
-                  {/* <MetricCard title="Plan" value="1200" />
-          <MetricCard title="Actual" value="1100" />
-          <MetricCard title="Downtime" value="45m" />
-          <MetricCard title="Good" value="1050" />
-          <MetricCard title="Bad" value="50" /> */}
+              <div className="flex items-center justify-between gap-2">
+                <CircularChart value={Number(assemblyData.OEEPct || 0)} label="OEE" />
+
+                <div className="flex gap-8">
+                  <CircularChart value={Number(assemblyData.AvailabilityPct || 0)} label="A" />
+                  <CircularChart value={Number(assemblyData.PerformancePct || 0)} label="P" />
+                  <CircularChart value={Number(assemblyData.QualityPct || 0)} label="Q" />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            </CardContent>
+          </Card>
+
         </div>
 
         {/* SMT Trends */}
