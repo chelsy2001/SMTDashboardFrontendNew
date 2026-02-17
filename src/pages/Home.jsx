@@ -31,13 +31,6 @@ const trendData = Array.from({ length: 8 }, (_, i) => ({
   OEE: 70 + Math.random() * 20,
 }));
 
-const smtLines = Array.from({ length: 12 }, (_, i) => ({
-  line: `Line ${i + 1}`,
-  OLE: 70 + Math.random() * 20,
-  A: 75 + Math.random() * 15,
-  P: 70 + Math.random() * 15,
-  Q: 85 + Math.random() * 10,
-}));
 
 /* ================== COMPONENTS ================== */
 const FilterBar = ({
@@ -118,7 +111,9 @@ const MetricCard = ({ title, value }) => (
 
 const TrendChart = ({
   title,
-  color = "#93c5fd",   // light blue default
+  data,
+  dataKey,
+  color = "#93c5fd",
   light = false,
 }) => {
   const gradientId = `gradient-${title.replace(/\s+/g, "")}`;
@@ -126,12 +121,10 @@ const TrendChart = ({
   return (
     <Card className="mb-4 bg-white rounded-xl shadow-sm border">
       <CardContent>
-        <h3 className="font-bold mb-3 text-black text-center">
-          {title}
-        </h3>
+        <h3 className="font-bold mb-3 text-black text-center">{title}</h3>
 
         <ResponsiveContainer width="100%" height={220}>
-          <AreaChart data={trendData}>
+          <AreaChart data={data}>
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                 <stop
@@ -147,13 +140,17 @@ const TrendChart = ({
               </linearGradient>
             </defs>
 
-            <XAxis dataKey="time" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+            <XAxis
+              dataKey="label"
+              tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }}
+              interval="preserveStartEnd"
+            />
             <YAxis domain={[0, 100]} tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
             <Tooltip />
 
             <Area
               type="monotone"
-              dataKey="OEE"
+              dataKey={dataKey}
               stroke={color}
               fill={`url(#${gradientId})`}
               strokeWidth={2}
@@ -183,12 +180,11 @@ const KpiBar = ({ label, value, color }) => (
   </div>
 );
 
-
-const LineOLESection = () => (
+const LineOLESection = ({ data = [] }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-5">
-    {smtLines.map((l) => (
+    {data.map((l) => (
       <motion.div
-        key={l.line}
+        key={l.LineID}
         whileHover={{ y: -8, scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
@@ -196,23 +192,26 @@ const LineOLESection = () => (
           <CardContent className="space-y-3">
             {/* Line Header */}
             <div className="flex items-center justify-between">
-              <p className="font-semibold text-gray-800">{l.line}</p>
+              <p className="font-semibold text-gray-800">
+                 {l.LineName}
+              </p>
               <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
                 SMT
               </span>
             </div>
 
             {/* KPIs */}
-            <KpiBar label="OLE" value={l.OLE} color="#2563eb" />
-            <KpiBar label="Availability" value={l.A} color="#16a34a" />
-            <KpiBar label="Performance" value={l.P} color="#f59e0b" />
-            <KpiBar label="Quality" value={l.Q} color="#22c55e" />
+            <KpiBar label="OLE" value={Number(l.OEEPct || 0)} color="#2563eb" />
+            <KpiBar label="Availability" value={Number(l.AvailabilityPct || 0)} color="#16a34a" />
+            <KpiBar label="Performance" value={Number(l.PerformancePct || 0)} color="#f59e0b" />
+            <KpiBar label="Quality" value={Number(l.QualityPct || 0)} color="#22c55e" />
           </CardContent>
         </Card>
       </motion.div>
     ))}
   </div>
 );
+
 
 /* ---------- Circular Chart ---------- */
 const CircularChart = ({
@@ -281,6 +280,9 @@ export default function SMTDashboard() {
   const [shift, setShift] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [trendData, setTrendData] = useState([]);
+const [assemblyTrendData, setAssemblyTrendData] = useState([]);
+const [lineWiseData, setLineWiseData] = useState([]);
 
   const [smtData, setSmtData] = useState({
     AvailabilityPct: 0,
@@ -342,11 +344,151 @@ export default function SMTDashboard() {
     }
   };
 
+
+
+  //for oee apq trend
+  const getTrendMode = () => {
+    // If user selected date range
+    if (startDate && endDate) {
+      if (startDate === endDate) return "Hourly";
+      return "Daywise";
+    }
+    // FilterType based
+    if (filterType === "WEEK" || filterType === "MONTH") return "Daywise";
+
+    return "Hourly"; // SHIFT or DAY
+  };
+  const fetchPlantTrend = async () => {
+    try {
+      const trendFilterType =
+        startDate && endDate ? "DATERANGE" : filterType;
+
+      const response = await axios.get(`${BASE_URL}/Home/plant-smtLine-apq-oee-trend`, {
+        params: {
+          filterType: trendFilterType,
+          shift: shift || null,
+          startDate: startDate || null,
+          endDate: endDate || null,
+        },
+      });
+
+      setTrendData(response.data || []);
+    } catch (error) {
+      console.error("Error fetching Plant Trend:", error);
+    }
+  };
+  const formatHourLabelFromUTCString = (utcString) => {
+    if (!utcString) return "";
+    // "2026-02-06T06:00:00.000Z"
+    const timePart = utcString.split("T")[1]; // "06:00:00.000Z"
+    const hourMin = timePart.substring(0, 5); // "06:00"
+
+    return hourMin;
+  };
+
+  const formatDateLabel = (dateString) => {
+    if (!dateString) return "";
+    // "2026-02-06T00:00:00.000Z"
+    const datePart = dateString.split("T")[0]; // "2026-02-06"
+
+    const [yyyy, mm, dd] = datePart.split("-");
+    return `${dd}-${mm}`; // 06-02
+  };
+
+  const trendMode = getTrendMode();
+
+  const formattedTrendData = trendData.map((row) => {
+    if (trendMode === "Hourly") {
+      return {
+        label: formatHourLabelFromUTCString(row.TimeStamp),
+        OEE: Number(row.OEE || 0),
+        Availability: Number(row.Availability || 0),
+        Performance: Number(row.Performance || 0),
+        Quality: Number(row.Quality || 0),
+      };
+    }
+
+    // Daywise
+    return {
+      label: formatDateLabel(row.ProdDate),
+      OEE: Number(row.OEE || 0),
+      Availability: Number(row.Availability || 0),
+      Performance: Number(row.Performance || 0),
+      Quality: Number(row.Quality || 0),
+    };
+  });
+
+const fetchAssemblyTrend = async () => {
+  try {
+    const trendFilterType = startDate && endDate ? "DATERANGE" : filterType;
+
+    const response = await axios.get(
+      `${BASE_URL}/Home/plant-assemblyLine-apq-oee-trend`,
+      {
+        params: {
+          filterType: trendFilterType,
+          shift: shift || null,
+          startDate: startDate || null,
+          endDate: endDate || null,
+        },
+      }
+    );
+
+    setAssemblyTrendData(response.data || []);
+  } catch (error) {
+    console.error("Error fetching Assembly Trend:", error);
+  }
+};
+const formattedAssemblyTrendData = assemblyTrendData.map((row) => {
+  if (trendMode === "Hourly") {
+    return {
+      label: formatHourLabelFromUTCString(row.TimeStamp),
+      OEE: Number(row.OEE || 0),
+      Availability: Number(row.Availability || 0),
+      Performance: Number(row.Performance || 0),
+      Quality: Number(row.Quality || 0),
+    };
+  }
+
+  return {
+    label: formatDateLabel(row.ProdDate),
+    OEE: Number(row.OEE || 0),
+    Availability: Number(row.Availability || 0),
+    Performance: Number(row.Performance || 0),
+    Quality: Number(row.Quality || 0),
+  };
+});
+
+const fetchLineWiseOLE = async () => {
+  try {
+    const lineFilterType = startDate && endDate ? "DATERANGE" : filterType;
+
+    const response = await axios.get(`${BASE_URL}/Home/LineWise-apq-ole`, {
+      params: {
+        filterType: lineFilterType,
+        shift: shift || null,
+        startDate: startDate || null,
+        endDate: endDate || null,
+      },
+    });
+
+    setLineWiseData(response.data || []);
+  } catch (error) {
+    console.error("Error fetching LineWise OLE:", error);
+  }
+};
+
+
+
+
+  //--------------------------------------------------------------------
   useEffect(() => {
     fetchPlantOEE();
     fetchPlantAssemblyOEE();
+    fetchPlantTrend();
+      fetchAssemblyTrend();
+      fetchLineWiseOLE();
   }, [filterType, shift, startDate, endDate]);
-
 
   return (
     <DashboardLayout>
@@ -413,13 +555,32 @@ export default function SMTDashboard() {
             {/* LIGHT OEE */}
             <TrendChart
               title="SMT OEE Trend"
-              color="#93c5fd"   // light blue
+              data={formattedTrendData}
+              dataKey="OEE"
+              color="#93c5fd"
               light
             />
 
-            <TrendChart title="Availability" color="#9b83b4" />
-            <TrendChart title="Performance" color="#acb5e0" />
-            <TrendChart title="Quality" color="#c52281" />
+            <TrendChart
+              title="Availability"
+              data={formattedTrendData}
+              dataKey="Availability"
+              color="#9b83b4"
+            />
+
+            <TrendChart
+              title="Performance"
+              data={formattedTrendData}
+              dataKey="Performance"
+              color="#acb5e0"
+            />
+
+            <TrendChart
+              title="Quality"
+              data={formattedTrendData}
+              dataKey="Quality"
+              color="#c52281"
+            />
           </div>
         </div>
 
@@ -427,12 +588,36 @@ export default function SMTDashboard() {
         <div className="space-y-4">
           <SectionHeader title="Assembly Trends" />
 
-          <div className="gap-6">
-            <TrendChart title="Assembly OEE Trend" color="#93a6ce" />
-            <TrendChart title="Availability" color="#9b83b4" />
-            <TrendChart title="Performance" color="#acb5e0" />
-            <TrendChart title="Quality" color="#c52281" />
-          </div>
+    <div className="gap-6">
+    <TrendChart
+      title="Assembly OEE Trend"
+      data={formattedAssemblyTrendData}
+      dataKey="OEE"
+      color="#93a6ce"
+      light
+    />
+
+    <TrendChart
+      title="Availability"
+      data={formattedAssemblyTrendData}
+      dataKey="Availability"
+      color="#9b83b4"
+    />
+
+    <TrendChart
+      title="Performance"
+      data={formattedAssemblyTrendData}
+      dataKey="Performance"
+      color="#acb5e0"
+    />
+
+    <TrendChart
+      title="Quality"
+      data={formattedAssemblyTrendData}
+      dataKey="Quality"
+      color="#c52281"
+    />
+  </div>
         </div>
 
 
@@ -441,7 +626,8 @@ export default function SMTDashboard() {
           <SectionHeader title="SMT Line OLE" />
 
         </div>
-        <LineOLESection />
+       <LineOLESection data={lineWiseData} />
+
       </div>
     </DashboardLayout>
   );
