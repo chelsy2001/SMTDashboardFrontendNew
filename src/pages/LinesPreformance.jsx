@@ -1,8 +1,8 @@
-import { React, useState } from "react";
+import { React, useState , useEffect } from "react";
 import DashboardLayout from "../partials/DashboardLayout";
 
 import { motion } from "framer-motion";
-
+import axios from "axios";
 import {
   PieChart,
   Pie,
@@ -23,6 +23,10 @@ import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import { LineChart, Line, CartesianGrid, Legend } from "recharts";
 import { TrendingUp, Target, Clock, CheckCircle, XCircle } from "lucide-react";
+
+const BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
+
+
 /* ================== LOCAL CARD COMPONENT ================== */
 const Card = ({ children, className = "", ...props }) => (
   <div
@@ -33,117 +37,95 @@ const Card = ({ children, className = "", ...props }) => (
   </div>
 );
 
-const qualityHourlyData = [
-  { hour: "08", expected: 95, actual: 92 },
-  { hour: "09", expected: 95, actual: 90 },
-  { hour: "10", expected: 95, actual: 94 },
-  { hour: "11", expected: 95, actual: 91 },
-  { hour: "12", expected: 95, actual: 93 },
-];
-const qualityHourlyData2 = [
-  { hour: "08", TotalPart: 95, RejectedPart: 92 },
-  { hour: "09", TotalPart: 95, RejectedPart: 90 },
-  { hour: "10", TotalPart: 95, RejectedPart: 94 },
-  { hour: "11", TotalPart: 95, RejectedPart: 91 },
-  { hour: "12", TotalPart: 95, RejectedPart: 93 },
-];
 
-const rejectionReasonData = [
-  { name: "Tool", value: 25 },
-  { name: "Method", value: 40 },
-  { name: "Process", value: 18 },
-  { name: "Material", value: 18 },
-  { name: "Other", value: 10 },
-  { name: "ABC", value: 20 },
-  { name: "DEF", value: 30 },
-  { name: "XYZ", value: 35 },
-];
+
 
 const CardContent = ({ children, className = "" }) => (
   <div className={`p-4 ${className}`}>{children}</div>
 );
 
-const RejectionReason = () => (
-  <>
-    <SectionHeader title=" Rejection Reason Analysis" />
-    <div className=" gap-6">
-      <Card className="bg-white rounded-xl shadow">
-        <CardContent>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={rejectionReasonData} layout="vertical">
-              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis type="category" dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
-              <Tooltip contentStyle={{ color: 'black' }}/>
-              <Bar dataKey="value" fill="#60a5fa" radius={[6, 6, 0, 0]}/>
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-    </div>
-  </>
-);
+const RejectionReason = ({ data = [], loading }) => {
+  if (loading) {
+    return <div className="text-center py-6">Loading Rejection Data...</div>;
+  }
 
-const QualityHourlyChart = () => (
+  if (!data || data.length === 0) {
+    return <div className="text-center py-6">No Rejection Data Available</div>;
+  }
+
+  return (
+    <>
+      <SectionHeader title=" Rejection Reason Analysis" />
+      <div className=" gap-6">
+        <Card className="bg-white rounded-xl shadow">
+          <CardContent>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={data} layout="vertical">
+                <XAxis
+                  type="number"
+                  tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={120}
+                  tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }}
+                />
+                <Tooltip contentStyle={{ color: "black" }} />
+                <Bar
+                  dataKey="value"
+                  fill="#60a5fa"
+                  radius={[0, 6, 6, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+    </>
+  );
+};
+
+
+const QualityHourlyChart = ({ data }) => (
   <Card className="bg-white rounded-xl shadow">
     <CardContent>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={qualityHourlyData}>
+        <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
-          <YAxis domain={[80, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-          <Tooltip contentStyle={{ color: 'black' }} />
+          <XAxis dataKey="hour" />
+          <YAxis />
+          <Tooltip />
           <Legend />
 
-          <Line
-            type="monotone"
-            dataKey="expected"
-            stroke="#25c7eb"
-            strokeWidth={2}
-            dot={false}
-          />
-
-          <Line
-            type="monotone"
-            dataKey="actual"
-            stroke="#3b1d82"
-            strokeWidth={2}
-          />
+          <Line type="monotone" dataKey="expected" stroke="#25c7eb" strokeWidth={2} />
+          <Line type="monotone" dataKey="actual" stroke="#3b1d82" strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
     </CardContent>
   </Card>
 );
 
-const QualityHourlyChart2 = () => (
+
+const QualityHourlyChart2 = ({ data }) => (
   <Card className="bg-white rounded-xl shadow">
     <CardContent>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={qualityHourlyData2}>
+        <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-          <YAxis domain={[80, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-          <Tooltip contentStyle={{ color: 'black' }} />
+          <XAxis dataKey="hour" />
+          <YAxis />
+          <Tooltip />
           <Legend />
 
-          <Line
-            type="monotone"
-            dataKey="TotalPart"
-            stroke="#9925eb"
-            strokeWidth={2}
-            dot={false}
-          />
-
-          <Line
-            type="monotone"
-            dataKey="RejectedPart"
-            stroke="#16a39e"
-            strokeWidth={2}
-          />
+          <Line type="monotone" dataKey="TotalPart" stroke="#9925eb" strokeWidth={2} />
+          <Line type="monotone" dataKey="RejectedPart" stroke="#16a39e" strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
     </CardContent>
   </Card>
 );
+
 const metricConfig = {
   Plan: {
     icon: Target,
@@ -251,7 +233,9 @@ const MetricCard = ({ title, value }) => {
 
 const TrendChart = ({
   title,
-  color = "#93c5fd", // light blue default
+  data = [],
+  dataKey = "OEE",
+  color = "#93c5fd",
   light = false,
 }) => {
   const gradientId = `gradient-${title.replace(/\s+/g, "")}`;
@@ -264,7 +248,7 @@ const TrendChart = ({
         </h3>
 
         <ResponsiveContainer width="100%" height={220}>
-          <AreaChart data={trendData}>
+          <AreaChart data={data}>
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                 <stop
@@ -286,7 +270,7 @@ const TrendChart = ({
 
             <Area
               type="monotone"
-              dataKey="OEE"
+              dataKey={dataKey}
               stroke={color}
               fill={`url(#${gradientId})`}
               strokeWidth={2}
@@ -325,44 +309,75 @@ const SectionHeader = ({ title }) => (
 );
 
 /* ================== COMPONENTS ================== */
-const FilterBar = () => {
-  const filters = ["Shift", "Day", "Week", "Month"];
+const FilterBar = ({
+  filterType,
+  setFilterType,
+  shift,
+  setShift,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+}) => {
+  const filters = ["SHIFT", "DAY", "WEEK", "MONTH"];
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow">
-      {/* LEFT – Time Filters */}
-      <div className="flex gap-2">
-        {filters.map((f, i) => (
-          <button
-            key={f}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition
-              ${
-                i === 0
+
+      <div className="flex items-center gap-3">
+
+        <div className="flex gap-2">
+          {filters.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilterType(f.toUpperCase())}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition
+      ${filterType === f.toUpperCase()
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }
-            `}
-          >
-            {f}
-          </button>
-        ))}
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"}
+    `}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+
+        <select
+          value={shift}
+          onChange={(e) => setShift(e.target.value)}
+          className="px-3 py-2 rounded-lg text-sm border bg-gray-100"
+        >
+          <option value="">ALL</option>
+          <option value="A">Shift A</option>
+          <option value="B">Shift B</option>
+          <option value="C">Shift C</option>
+        </select>
       </div>
 
-      {/* RIGHT – Date Range */}
       <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border">
-        <span className="text-sm text-black font-medium">Start Date:</span>
-        <input type="date" className="px-2 py-1 text-sm rounded-md border" />
-        <span className="text-sm text-black font-medium">End Date:</span>
-        <input type="date" className="px-2 py-1 text-sm rounded-md border" />
+        <span className="text-sm font-medium">Start:</span>
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
       </div>
     </div>
   );
 };
 
-const LineSelector = () => {
-  const [activeLine, setActiveLine] = useState(5);
+const LineSelector = ({ setSelectedLine }) => {
+  const [lines, setLines] = useState([]);
+  const [activeLine, setActiveLine] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const sliderSettings = {
+   const sliderSettings = {
     dots: false,
     infinite: false,
     speed: 400,
@@ -379,48 +394,81 @@ const LineSelector = () => {
     ],
   };
 
-  return (
-    <div className="bg-white rounded-2xl shadow px-10 py-4">
-      {/* Header */}
-      <div className=" text-center mb-4">
-        <h3 className="font-semibold text-black text-lg text-center">
-          Line Selection
-        </h3>
-      </div>
+  useEffect(() => {
+    fetchLines();
+  }, []);
 
-      {/* Slider */}
-      <div className="relative">
-        <Slider {...sliderSettings}>
-          {Array.from({ length: 12 }).map((_, i) => {
-            const line = i + 1;
-            const isActive = activeLine === line;
+  const fetchLines = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${BASE_URL}/smtLine/GetLines`
+      );
+
+      const data = response.data?.data ?? response.data ?? [];
+      setLines(data);
+
+      if (Array.isArray(data) && data.length > 0) {
+        setActiveLine(data[0].LineID);
+        if (setSelectedLine) {
+          setSelectedLine(data[0].LineID);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching lines:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="text-center py-4">Loading Lines...</div>;
+  }
+
+  return (
+  <div className="bg-white rounded-2xl shadow px-10 py-6">
+    <div className="text-center mb-4">
+      <h3 className="font-semibold text-black text-lg">
+        Line Selection
+      </h3>
+    </div>
+
+    <div className="relative px-8">
+      <Slider {...sliderSettings}>
+        {Array.isArray(lines) &&
+          lines.map((line) => {
+            const isActive = activeLine === line.LineID;
 
             return (
-              <div key={line} className="px-3">
-                <motion.button
-                  onClick={() => setActiveLine(line)}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
-                  className={`
-                    w-full py-2.5 rounded-full text-sm font-semibold
-                    border transition-all duration-300
+              <div key={line.LineID} className="px-2">
+                <button
+                  onClick={() => {
+                    setActiveLine(line.LineID);
+                    if (setSelectedLine) {
+                      setSelectedLine(line.LineID);
+                    }
+                  }}
+                  className={`w-full px-5 py-2 rounded-full text-sm font-semibold transition
                     ${
                       isActive
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-transparent shadow-lg"
-                        : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-blue-50"
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+                        : "bg-gray-100 text-gray-700 hover:bg-blue-50"
                     }
                   `}
                 >
-                  Line {line}
-                </motion.button>
+                  {line.LineName}
+                </button>
               </div>
             );
           })}
-        </Slider>
-      </div>
+      </Slider>
     </div>
-  );
+  </div>
+);
+
 };
+
+
 const Arrow = ({ onClick, direction }) => (
   <button
     onClick={onClick}
@@ -440,98 +488,150 @@ const Arrow = ({ onClick, direction }) => (
 );
 
 
-const LineSummary = () => (
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    {/* LEFT – OEE + APQ */}
-    <Card className="bg-white rounded-xl shadow">
-      <CardContent className="p-6space-y-10">
-        <h3 className="text-lg font-bold text-gray-800 text-center">
-          Line OEE (A, P, Q)
-        </h3>
+const LineSummary = ({ data, loading }) => {
+  if (loading) {
+    return <div className="text-center py-6">Loading OEE...</div>;
+  }
 
-        <div className="flex justify-between items-center">
-          <CircularChart value={78} label="OEE" size={180} strokeWidth={18} />
+  if (!data) {
+    return <div className="text-center py-6">No Data Available</div>;
+  }
 
-          <div className="flex gap-6">
-            <CircularChart value={65} label="A" size={110} />
-            <CircularChart value={72} label="P" size={110} />
-            <CircularChart value={92} label="Q" size={110} />
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* LEFT – OEE + APQ */}
+      <Card className="bg-white rounded-xl shadow">
+        <CardContent className="p-6space-y-10">
+          <h3 className="text-lg font-bold text-gray-800 text-center">
+            Line OEE (A, P, Q)
+          </h3>
+
+          <div className="flex justify-between items-center">
+          <CircularChart value={data.OEEPct || 0} label="OEE" size={180} strokeWidth={18} />
+
+          <div className="flex gap-6 ">
+            <CircularChart value={data.AvailabilityPct || 0} label="A" size={110} />
+            <CircularChart value={data.PerformancePct || 0} label="P" size={110} />
+            <CircularChart value={data.QualityPct || 0} label="Q" size={110} />
           </div>
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-    {/* RIGHT – LINE TRENDS */}
-    <Card className="bg-white rounded-2xl shadow">
-      <CardContent className="space-y-4">
-        <h3 className="text-lg font-bold text-gray-800 text-center">
-          Production Summary
-        </h3>
+      {/* RIGHT – PRODUCTION SUMMARY */}
+      <Card className="bg-white rounded-2xl shadow">
+        <CardContent className="space-y-4">
+          <h3 className="text-lg font-bold text-gray-800 text-center">
+            Production Summary
+          </h3>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          <MetricCard title="Plan" value="1200" />
-          <MetricCard title="Actual" value="1100" />
-          <MetricCard title="Downtime" value="45m" />
-          <MetricCard title="Good" value="1050" />
-          <MetricCard title="Bad" value="50" />
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-);
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <MetricCard title="Plan" value={data.PlanQty || 0} />
+            <MetricCard title="Actual" value={data.ActualQty || 0} />
+            <MetricCard title="Downtime" value={`${data.DowntimeMin || 0}m`} />
+            <MetricCard title="Good" value={data.GoodParts || 0} />
+            <MetricCard title="Bad" value={data.BadParts || 0} />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
-const StationCards = () => {
+
+const StationCards = ({
+  selectedLine,
+  filterType,
+  shift,
+  startDate,
+  endDate,
+}) => {
   const navigate = useNavigate();
+  const [stationData, setStationData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (selectedLine) {
+      fetchStations();
+    }
+  }, [selectedLine, filterType, shift, startDate, endDate]);
+
+  const fetchStations = async () => {
+    try {
+      setLoading(true);
+
+      const params = {
+        LineID: selectedLine,
+        FilterType: filterType,
+      };
+
+      if (shift) params.Shift = shift;
+
+      if (filterType === "DATERANGE") {
+        params.StartDate = startDate;
+        params.EndDate = endDate;
+      }
+
+      const res = await axios.get(
+        `${BASE_URL}/smtLine/SMTLineStationWiseOEE`,
+        { params }
+      );
+
+      const data = res.data?.data ?? [];
+
+      if (Array.isArray(data)) {
+        setStationData(data);
+      }
+
+    } catch (err) {
+      console.error("Station API error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div>Loading Stations...</div>;
+
+  if (!stationData.length)
+    return <div className="text-center py-4">No Station Data</div>;
 
   return (
     <div className="space-y-4">
       <SectionHeader title="Stations" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-5">
-        {Array.from({ length: 8 }).map((_, i) => {
-          const stationName = `Station ${i + 1}`;
+        {stationData.map((station, i) => (
+          <Card
+            key={i}
+            className="bg-white rounded-lg shadow cursor-pointer hover:shadow-lg transition"
+            onClick={() =>
+              navigate("/LinesStationPreformance", {
+                state: { stationName: station.StationName },
+              })
+            }
+          >
+            <CardContent className="space-y-2">
+              <p className="font-bold text-black text-m text-center">
+                {station.StationName}
+              </p>
 
-          return (
-            <Card
-              key={i}
-              className="bg-white rounded-lg shadow cursor-pointer hover:shadow-lg transition"
-              onClick={() =>
-  navigate("/LinesStationPreformance", {
-    state: { stationName },
-  })
-}
-            >
-              <CardContent className="space-y-2">
-                <p className="font-bold text-black text-m text-center">
-                  {stationName}
-                </p>
-
-                <KpiBar
-                  label="OEE"
-                  value={70 + Math.random() * 20}
-                  color="#2563eb"
-                />
-                <KpiBar label="A" value={65 + Math.random() * 20} color="#16a34a" />
-                <KpiBar label="P" value={60 + Math.random() * 20} color="#f59e0b" />
-                <KpiBar label="Q" value={85 + Math.random() * 10} color="#22c55e" />
-              </CardContent>
-            </Card>
-          );
-        })}
+              <KpiBar label="OEE" value={station.OEEPct || 0} color="#2563eb" />
+              <KpiBar label="A" value={station.AvailabilityPct || 0} color="#16a34a" />
+              <KpiBar label="P" value={station.PerformancePct || 0} color="#f59e0b" />
+              <KpiBar label="Q" value={station.QualityPct || 0} color="#22c55e" />
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   );
 };
 
 
-const downtimeData = [
-  { name: "Loss 1", value: 45 },
-  { name: "Loss 2", value: 30 },
-  { name: "Loss 3", value: 65 },
-  { name: "Loss 4", value: 20 },
-];
 
-const M4DowntimeAnalysis = () => (
+
+const M4DowntimeAnalysis = ({ durationData, occurrenceData }) => (
+
   <div className="space-y-4">
     <SectionHeader title="M4 Downtime Analysis" />
 
@@ -541,7 +641,7 @@ const M4DowntimeAnalysis = () => (
         <CardContent>
           <h4 className="font-bold mb-2 text-black text-center">Duration Wise</h4>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={downtimeData}>
+            <BarChart data={durationData}>
               <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
               <YAxis tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
               <Tooltip contentStyle={{ color: 'black' }} />
@@ -556,7 +656,7 @@ const M4DowntimeAnalysis = () => (
         <CardContent>
           <h4 className="font-bold mb-2 text-black text-center">Occurrence Wise</h4>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={downtimeData}>
+            <BarChart data={occurrenceData}>
               <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
               <YAxis tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
               <Tooltip contentStyle={{ color: 'black' }} />
@@ -569,7 +669,8 @@ const M4DowntimeAnalysis = () => (
   </div>
 );
 
-const TPMDowntimeAnalysis = () => (
+const TPMDowntimeAnalysis = ({ durationData, occurrenceData }) => (
+
   <div className="space-y-4">
     <SectionHeader title="TPM Downtime Analysis" />
 
@@ -581,7 +682,7 @@ const TPMDowntimeAnalysis = () => (
 
           <ResponsiveContainer width="100%" height={260}>
             <BarChart
-              data={downtimeData}
+              data={durationData}
               layout="vertical" // ⭐ IMPORTANT
               margin={{ left: 20 }}
             >
@@ -605,7 +706,7 @@ const TPMDowntimeAnalysis = () => (
 
           <ResponsiveContainer width="100%" height={260}>
             <BarChart
-              data={downtimeData}
+              data={occurrenceData}
               layout="vertical" // ⭐ IMPORTANT
               margin={{ left: 20 }}
             >
@@ -622,14 +723,365 @@ const TPMDowntimeAnalysis = () => (
 );
 
 const LinesPreformance = () => {
+  const [filterType, setFilterType] = useState("SHIFT");
+  const [shift, setShift] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [selectedLine, setSelectedLine] = useState(null);
+  const [lineOEEData, setLineOEEData] = useState(null);
+const [loadingOEE, setLoadingOEE] = useState(false);
+const [trendData, setTrendData] = useState([]);
+const [loadingTrend, setLoadingTrend] = useState(false);
+const [m4DurationData, setM4DurationData] = useState([]);
+const [m4OccurrenceData, setM4OccurrenceData] = useState([]);
+const [tpmDurationData, setTpmDurationData] = useState([]);
+const [tpmOccurrenceData, setTpmOccurrenceData] = useState([]);
+const [planActualData, setPlanActualData] = useState([]);
+const [goodRejectData, setGoodRejectData] = useState([]);
+const [loadingQuality, setLoadingQuality] = useState(false);
+const [rejectionReasonData, setRejectionReasonData] = useState([]);
+const [loadingRejection, setLoadingRejection] = useState(false);
+const [stationData, setStationData] = useState([]);
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  const fetchStations = async () => {
+    try {
+      const res = await axios.get("/api/stations"); // apna API lagao
+      const data = res.data?.data ?? res.data ?? [];
+      setStationData(data);
+    } catch (err) {
+      console.error("Station API error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchStations();
+}, []);
+
+
+useEffect(() => {
+  if (selectedLine) {
+    fetchPlanVsActual();
+    fetchGoodVsRejection();
+  }
+}, [selectedLine, filterType, shift, startDate, endDate]);
+
+
+useEffect(() => {
+  if (selectedLine) {
+    fetchM4Loss();
+    fetchTPMLoss();
+  }
+}, [selectedLine, filterType, shift, startDate, endDate]);
+  
+
+useEffect(() => {
+  if (selectedLine) {
+    fetchLineLevelOEE();
+  }
+}, [selectedLine, filterType, shift, startDate, endDate]);
+
+useEffect(() => {
+  if (selectedLine) {
+    fetchTrendData();
+  }
+}, [selectedLine, filterType, shift, startDate, endDate]);
+
+useEffect(() => {
+  if (selectedLine) {
+    fetchRejectionReason();
+  }
+}, [selectedLine, filterType, shift, startDate, endDate]);
+
+
+const fetchTrendData = async () => {
+  try {
+    setLoadingTrend(true);
+
+    const params = {
+      LineID: selectedLine,
+      FilterType: filterType,
+    };
+
+    if (shift) params.Shift = shift;
+
+    if (filterType === "DATERANGE") {
+      params.StartDate = startDate;
+      params.EndDate = endDate;
+    }
+
+    const response = await axios.get(
+      `${BASE_URL}/smtLine/SMTLineWiseHourlyOEE`,
+      { params }
+    );
+
+    const data = response.data.data || response.data;
+
+    if (Array.isArray(data) && data.length > 0) {
+      const formatted = data.map((item, index) => ({
+        time: item.Hour || item.HourNo || `H${index + 1}`,
+        OEE: item.OEEPct || 0,
+        Availability: item.AvailabilityPct || 0,
+        Performance: item.PerformancePct || 0,
+        Quality: item.QualityPct || 0,
+      }));
+
+      setTrendData(formatted);
+    }
+  } catch (error) {
+    console.error("Error fetching trend data:", error);
+  } finally {
+    setLoadingTrend(false);
+  }
+};
+
+
+const fetchLineLevelOEE = async () => {
+  try {
+    setLoadingOEE(true);
+
+    const params = {
+      LineID: selectedLine,
+      FilterType: filterType,
+    };
+
+    if (shift) params.Shift = shift;
+    if (filterType === "DATERANGE") {
+      params.StartDate = startDate;
+      params.EndDate = endDate;
+    }
+
+    const response = await axios.get(
+      `${BASE_URL}/smtLine/LineLevelOEE`,
+      { params }
+    );
+
+    const data = response.data.data || response.data;
+
+    if (Array.isArray(data) && data.length > 0) {
+      setLineOEEData(data[0]);
+    }
+  } catch (error) {
+    console.error("Error fetching OEE:", error);
+  } finally {
+    setLoadingOEE(false);
+  }
+};
+
+const fetchM4Loss = async () => {
+  try {
+    const params = {
+      LineID: selectedLine,
+      FilterType: filterType,
+    };
+
+    if (shift) params.Shift = shift;
+
+    if (filterType === "DATERANGE") {
+      params.StartDate = startDate;
+      params.EndDate = endDate;
+    }
+
+    const response = await axios.get(
+      `${BASE_URL}/smtLine/SMTLineWise4MLoss`,
+      { params }
+    );
+
+    const data = response.data.data || response.data;
+
+    if (Array.isArray(data)) {
+     const duration = data.map(item => ({
+  name: item.LossType,
+  value: item.TotalDuration || 0,
+}));
+
+const occurrence = data.map(item => ({
+  name: item.LossType,
+  value: item.Occurrence || 0,
+}));
+
+
+      setM4DurationData(duration);
+      setM4OccurrenceData(occurrence);
+    }
+  } catch (error) {
+    console.error("M4 Loss API error:", error);
+  }
+};
+
+const fetchTPMLoss = async () => {
+  try {
+    const params = {
+      LineID: selectedLine,
+      FilterType: filterType,
+    };
+
+    if (shift) params.Shift = shift;
+
+    if (filterType === "DATERANGE") {
+      params.StartDate = startDate;
+      params.EndDate = endDate;
+    }
+
+    const response = await axios.get(
+      `${BASE_URL}/smtLine/SMTLineWiseTPMLoss`,
+      { params }
+    );
+
+    const data = response.data.data || response.data;
+
+    if (Array.isArray(data)) {
+      const duration = data.map(item => ({
+        name: item.LossName,
+        value: item.DurationMin || 0,
+      }));
+
+      const occurrence = data.map(item => ({
+        name: item.LossName,
+        value: item.OccurrenceCount || 0,
+      }));
+
+      setTpmDurationData(duration);
+      setTpmOccurrenceData(occurrence);
+    }
+  } catch (error) {
+    console.error("TPM Loss API error:", error);
+  }
+};
+
+const fetchPlanVsActual = async () => {
+  try {
+    setLoadingQuality(true);
+
+    const params = {
+      LineID: selectedLine,
+      FilterType: filterType,
+    };
+
+    if (shift) params.Shift = shift;
+
+    if (filterType === "DATERANGE") {
+      params.StartDate = startDate;
+      params.EndDate = endDate;
+    }
+
+    const response = await axios.get(
+      `${BASE_URL}/smtLine/SMTLinePlanVsActual`,
+      { params }
+    );
+
+    const data = response.data?.data || [];
+
+    if (Array.isArray(data)) {
+      const formatted = data.map((item, index) => ({
+        hour: item.Hour || item.HourNo || `H${index + 1}`,
+        expected: item.PlanQty || item.Plan || 0,
+        actual: item.ActualQty || item.Actual || 0,
+      }));
+
+      setPlanActualData(formatted);
+    }
+
+  } catch (error) {
+    console.error("Plan vs Actual API error:", error);
+  } finally {
+    setLoadingQuality(false);
+  }
+};
+const fetchGoodVsRejection = async () => {
+  try {
+    const params = {
+      LineID: selectedLine,
+      FilterType: filterType,
+    };
+
+    if (shift) params.Shift = shift;
+
+    if (filterType === "DATERANGE") {
+      params.StartDate = startDate;
+      params.EndDate = endDate;
+    }
+
+    const response = await axios.get(
+      `${BASE_URL}/smtLine/SMTLineGoodVsRejection`,
+      { params }
+    );
+
+    const data = response.data?.data || [];
+
+    if (Array.isArray(data)) {
+      const formatted = data.map((item, index) => ({
+        hour: item.Hour || item.HourNo || `H${index + 1}`,
+        TotalPart: item.GoodQty || item.TotalQty || 0,
+        RejectedPart: item.RejectionQty || item.BadQty || 0,
+      }));
+
+      setGoodRejectData(formatted);
+    }
+
+  } catch (error) {
+    console.error("Good vs Rejection API error:", error);
+  }
+};
+const fetchRejectionReason = async () => {
+  try {
+    setLoadingRejection(true);
+
+    const params = {
+      LineID: selectedLine,
+      FilterType: filterType,
+    };
+
+    if (shift) params.Shift = shift;
+    if (filterType === "DATERANGE") {
+      params.StartDate = startDate;
+      params.EndDate = endDate;
+    }
+
+    const response = await axios.get(
+      `${BASE_URL}/smtLine/SMTLineRejectionReason`,
+      { params }
+    );
+
+    const data = response.data?.data || [];
+
+    if (Array.isArray(data)) {
+      const formatted = data.map(item => ({
+        name: item.ReasonName || item.LossName || item.RejectionReason,
+        value: item.TotalCount || item.Count || item.RejectionCount || 0,
+      }));
+
+      setRejectionReasonData(formatted);
+    }
+
+  } catch (error) {
+    console.error("Rejection Reason API error:", error);
+  } finally {
+    setLoadingRejection(false);
+  }
+};
+
   return (
     <DashboardLayout>
       <div className="pl-6 pr-6 pb-6 space-y-8 bg-gray-100 min-h-screen">
-        <FilterBar />
+         {/* Filters */}
+        <FilterBar
+          filterType={filterType}
+          setFilterType={setFilterType}
+          shift={shift}
+          setShift={setShift}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
 
-        <LineSelector />
+       <LineSelector setSelectedLine={setSelectedLine} />
 
-        <LineSummary />
+       <LineSummary data={lineOEEData} loading={loadingOEE} />
+
 
         {/* Line Trends */}
         <div className="space-y-4">
@@ -638,30 +1090,67 @@ const LinesPreformance = () => {
           <div className="gap-6">
             {/* LIGHT OEE */}
             <TrendChart
-              title="OEE Trend"
-              color="#93c5fd" // light blue
-              light
-            />
+  title="OEE Trend"
+  data={trendData}
+  dataKey="OEE"
+  color="#93c5fd"
+  light
+/>
 
-            <TrendChart title="Availability" color="#9b83b4" />
-            <TrendChart title="Performance" color="#acb5e0" />
-            <TrendChart title="Quality" color="#c52281" />
+<TrendChart
+  title="Availability"
+  data={trendData}
+  dataKey="Availability"
+  color="#9b83b4"
+/>
+
+<TrendChart
+  title="Performance"
+  data={trendData}
+  dataKey="Performance"
+  color="#acb5e0"
+/>
+
+<TrendChart
+  title="Quality"
+  data={trendData}
+  dataKey="Quality"
+  color="#c52281"
+/>
+
           </div>
         </div>
 
      
 
-        <M4DowntimeAnalysis />
+       <M4DowntimeAnalysis
+  durationData={m4DurationData}
+  occurrenceData={m4OccurrenceData}
+/>
 
-        <TPMDowntimeAnalysis />
+<TPMDowntimeAnalysis
+  durationData={tpmDurationData}
+  occurrenceData={tpmOccurrenceData}
+/>
 
         <SectionHeader title="Quality Planned vs Actual​" />
-        <QualityHourlyChart />
+        <QualityHourlyChart data={planActualData} />
 <SectionHeader title="Total Parts vs Rejection Part" />
-        <QualityHourlyChart2 />
-        <RejectionReason />
+        <QualityHourlyChart2 data={goodRejectData} />
+        <RejectionReason
+  data={rejectionReasonData}
+  loading={loadingRejection}
+/>
 
-           <StationCards/>
+
+          <StationCards
+  selectedLine={selectedLine}
+  filterType={filterType}
+  shift={shift}
+  startDate={startDate}
+  endDate={endDate}
+/>
+
 
       </div>
     </DashboardLayout>
