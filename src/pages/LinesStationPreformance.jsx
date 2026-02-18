@@ -322,39 +322,69 @@ const SectionHeader = ({ title }) => (
 );
 
 /* ================== COMPONENTS ================== */
-const FilterBar = () => {
-  const filters = ["Shift", "Day", "Week", "Month"];
+const FilterBar = ({
+  filterType,
+  setFilterType,
+  shift,
+  setShift,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+}) => {
+  const filters = ["SHIFT", "DAY", "WEEK", "MONTH"];
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow">
-      {/* LEFT – Time Filters */}
-      <div className="flex gap-2">
-        {filters.map((f, i) => (
-          <button
-            key={f}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition
-              ${
-                i === 0
+
+      <div className="flex items-center gap-3">
+
+        <div className="flex gap-2">
+          {filters.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilterType(f.toUpperCase())}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition
+      ${filterType === f.toUpperCase()
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }
-            `}
-          >
-            {f}
-          </button>
-        ))}
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"}
+    `}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+
+        <select
+          value={shift}
+          onChange={(e) => setShift(e.target.value)}
+          className="px-3 py-2 rounded-lg text-sm border bg-gray-100"
+        >
+          <option value="">ALL</option>
+          <option value="A">Shift A</option>
+          <option value="B">Shift B</option>
+          <option value="C">Shift C</option>
+        </select>
       </div>
 
-      {/* RIGHT – Date Range */}
       <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border">
-        <span className="text-sm text-black font-medium">Start Date:</span>
-        <input type="date" className="px-2 py-1 text-sm rounded-md border" />
-        <span className="text-sm text-black font-medium">End Date:</span>
-        <input type="date" className="px-2 py-1 text-sm rounded-md border" />
+        <span className="text-sm font-medium">Start:</span>
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
       </div>
     </div>
   );
 };
+
 
 
 const StationSummary = () => (
@@ -500,12 +530,25 @@ const LinesStationPreformance = () => {
 
     const location = useLocation();
   const stationName = location.state?.stationName;
+  const [filterType, setFilterType] = useState("SHIFT");
+    const [shift, setShift] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
 //   const stationName = location.state?.stationName || "No Station Selected";
 
   return (
     <DashboardLayout>
       <div className="pl-6 pr-6 pb-6 space-y-8 bg-gray-100 min-h-screen">
-        <FilterBar />
+        <FilterBar
+          filterType={filterType}
+          setFilterType={setFilterType}
+          shift={shift}
+          setShift={setShift}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
 
  <div className="flex justify-center mb-6">
   <div className="flex items-center gap-4 bg-white px-8 py-4 rounded-2xl shadow-md border border-gray-100">

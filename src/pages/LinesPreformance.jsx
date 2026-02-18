@@ -606,7 +606,11 @@ const StationCards = ({
             className="bg-white rounded-lg shadow cursor-pointer hover:shadow-lg transition"
             onClick={() =>
               navigate("/LinesStationPreformance", {
-                state: { stationName: station.StationName },
+                state: { 
+                  stationName: station.StationName,
+                  stationId: station.StationID,
+                  lineId: selectedLine
+                },
               })
             }
           >
@@ -669,58 +673,87 @@ const M4DowntimeAnalysis = ({ durationData, occurrenceData }) => (
   </div>
 );
 
-const TPMDowntimeAnalysis = ({ durationData, occurrenceData }) => (
+const TPMDowntimeAnalysis = ({ durationData = [], occurrenceData = [] }) => {
 
-  <div className="space-y-4">
-    <SectionHeader title="TPM Downtime Analysis" />
+  const renderChart = (data, title, color) => {
 
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Duration Wise */}
-      <Card className="bg-white rounded-xl shadow">
-        <CardContent>
-          <h4 className="font-bold mb-2 text-black text-center">Duration Wise</h4>
+    const sortedData = [...data].sort((a, b) => b.value - a.value);
 
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart
-              data={durationData}
-              layout="vertical" // ⭐ IMPORTANT
-              margin={{ left: 20 }}
-            >
-              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis type="category" dataKey="name" width={80}tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <Tooltip contentStyle={{ color: 'black' }} />
-              <Bar
-                dataKey="value"
-                fill="#60a5fa"
-                radius={[0, 6, 6, 0]} // right side rounded
-              />
-            </BarChart>
-          </ResponsiveContainer>
+    // Dynamic height based on data count
+    const chartHeight = Math.max(sortedData.length * 45, 300);
+
+    return (
+      <Card className="bg-white rounded-2xl shadow-lg border border-gray-100">
+        <CardContent className="p-6">
+          <h4 className="font-semibold text-gray-700 text-lg text-center mb-4">
+            {title}
+          </h4>
+
+          {/* Scroll Wrapper */}
+          <div className="overflow-y-auto" style={{ maxHeight: "420px" }}>
+            <div style={{ height: chartHeight }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={sortedData}
+                  layout="vertical"
+                  margin={{ top: 10, right: 20, left: 10, bottom: 10 }}  // 👈 left space fix
+                >
+                  <XAxis
+                    type="number"
+                    tick={{ fill: "#6b7280", fontSize: 13 }}
+                  />
+
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={140} // 👈 optimized width
+                    tick={{ fill: "#374151", fontSize: 13 }}
+                    tickFormatter={(value) =>
+                      value.length > 22
+                        ? value.substring(0, 22) + "..."
+                        : value
+                    }
+                  />
+
+                  <Tooltip />
+
+                  <Bar
+                    dataKey="value"
+                    fill={color}
+                    radius={[0, 10, 10, 0]}
+                    barSize={22}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </CardContent>
       </Card>
+    );
+  };
 
-      {/* Occurrence Wise */}
-      <Card className="bg-white rounded-xl shadow">
-        <CardContent>
-          <h4 className="font-bold mb-2 text-black text-center">Occurrence Wise</h4>
+  return (
+    <div className="space-y-6">
+      <SectionHeader title="TPM Downtime Analysis" />
 
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart
-              data={occurrenceData}
-              layout="vertical" // ⭐ IMPORTANT
-              margin={{ left: 20 }}
-            >
-              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis type="category" dataKey="name" width={80} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <Tooltip contentStyle={{ color: 'black' }} />
-              <Bar dataKey="value" fill="#f59e0b" radius={[0, 6, 6, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {renderChart(
+          durationData,
+          "Duration Wise Loss (Minutes)",
+          "#3b82f6"
+        )}
+
+        {renderChart(
+          occurrenceData,
+          "Occurrence Wise Loss (Count)",
+          "#f59e0b"
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
+
 
 const LinesPreformance = () => {
   const [filterType, setFilterType] = useState("SHIFT");
