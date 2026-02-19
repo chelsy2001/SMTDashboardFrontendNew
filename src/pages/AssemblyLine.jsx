@@ -3,6 +3,8 @@ import DashboardLayout from "../partials/DashboardLayout";
 import { useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
+import { useEffect, useRef } from "react";
 
 import {
   PieChart,
@@ -65,10 +67,10 @@ const RejectionReason = () => (
         <CardContent>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={rejectionReasonData} layout="vertical">
-              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis type="category" dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
-              <Tooltip contentStyle={{ color: 'black' }}/>
-              <Bar dataKey="value" fill="#60a5fa" radius={[6, 6, 0, 0]}/>
+              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+              <YAxis type="category" dataKey="name" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+              <Tooltip contentStyle={{ color: 'black' }} />
+              <Bar dataKey="value" fill="#60a5fa" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -83,8 +85,8 @@ const QualityHourlyChart = () => (
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={qualityHourlyData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
-          <YAxis domain={[80, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+          <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+          <YAxis domain={[80, 100]} tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
           <Tooltip contentStyle={{ color: 'black' }} />
           <Legend />
 
@@ -114,8 +116,8 @@ const QualityHourlyChart2 = () => (
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={qualityHourlyData2}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-          <YAxis domain={[80, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+          <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+          <YAxis domain={[80, 100]} tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
           <Tooltip contentStyle={{ color: 'black' }} />
           <Legend />
 
@@ -174,8 +176,8 @@ const trendData = Array.from({ length: 8 }, (_, i) => ({
 /* ---------- Circular Chart ---------- */
 const CircularChart = ({ value, label, size = 120, strokeWidth = 12 }) => {
   const getColor = (val) => {
-    if (val >= 90 ) return "#16a34a";
-    if (val >=75 && val < 90) return "#f59e0b";
+    if (val >= 90) return "#16a34a";
+    if (val >= 75 && val < 90) return "#f59e0b";
     return "#dc2626";
   };
 
@@ -245,10 +247,29 @@ const MetricCard = ({ title, value }) => {
 
 const TrendChart = ({
   title,
-  color = "#93c5fd", // light blue default
-  light = false,
+  data,
+  dataKey,
+  color = "#93c5fd",
+  filterType,
 }) => {
-  const gradientId = `gradient-${title.replace(/\s+/g, "")}`;
+
+  const isHourly =
+    filterType === "SHIFT" || filterType === "DAY";
+
+  const formatHour = (utcString) => {
+    const date = new Date(utcString);
+
+    return date.toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB");
+  };
 
   return (
     <Card className="mb-4 bg-white rounded-xl shadow-sm border">
@@ -257,32 +278,32 @@ const TrendChart = ({
           {title}
         </h3>
 
-        <ResponsiveContainer width="100%" height={220}>
-          <AreaChart data={trendData}>
-            <defs>
-              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor={color}
-                  stopOpacity={light ? 0.45 : 0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor={color}
-                  stopOpacity={light ? 0.05 : 0.15}
-                />
-              </linearGradient>
-            </defs>
+        <ResponsiveContainer width="100%" height={250}>
+          <AreaChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
 
-            <XAxis dataKey="time" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-            <YAxis domain={[0, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-            <Tooltip contentStyle={{ color: 'black' }} />
+            <XAxis
+              dataKey="label"
+              interval={0}
+              angle={-45}
+              textAnchor="end"
+              height={60}
+            />
+
+            <YAxis domain={[0, 100]} />
+
+            <Tooltip
+              formatter={(value) => `${value}%`}
+              labelFormatter={(label) =>
+                isHourly ? formatHour(label) : formatDate(label)
+              }
+            />
 
             <Area
               type="monotone"
-              dataKey="OEE"
+              dataKey={dataKey}
               stroke={color}
-              fill={`url(#${gradientId})`}
+              fill={color}
               strokeWidth={2}
             />
           </AreaChart>
@@ -291,6 +312,8 @@ const TrendChart = ({
     </Card>
   );
 };
+
+
 const KpiBar = ({ label, value, color }) => (
   <div>
     <div className="flex justify-between text-xs mb-1">
@@ -319,42 +342,77 @@ const SectionHeader = ({ title }) => (
 );
 
 /* ================== COMPONENTS ================== */
-const FilterBar = () => {
+const FilterBar = ({
+  filterType,
+  setFilterType,
+  shift,
+  setShift,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
+}) => {
+
   const filters = ["Shift", "Day", "Week", "Month"];
+
+  const [selectedShift, setSelectedShift] = useState("");
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-xl shadow">
-      {/* LEFT – Time Filters */}
-      <div className="flex gap-2">
-        {filters.map((f, i) => (
-          <button
-            key={f}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition
-              ${
-                i === 0
+
+      {/* LEFT – Time Filters + Shift Dropdown */}
+      <div className="flex items-center gap-3">
+
+        {/* Time Buttons */}
+        <div className="flex gap-2">
+          {filters.map((f) => (
+            <button
+              key={f}
+              onClick={() => {
+                setFilterType(f.toUpperCase());
+                setStartDate("");
+                setEndDate("");
+              }}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition
+      ${filterType === f.toUpperCase()
                   ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }
-            `}
-          >
-            {f}
-          </button>
-        ))}
+                }
+    `}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+
+        {/* 🔥 Shift Dropdown */}
+        <select
+          value={shift}
+          onChange={(e) => setShift(e.target.value)}
+          className="px-4 py-2 rounded-lg text-sm border bg-gray-100 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">ALL</option>
+          <option value="A">Shift A</option>
+          <option value="B">Shift B</option>
+          <option value="C">Shift C</option>
+        </select>
+
       </div>
 
       {/* RIGHT – Date Range */}
       <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border">
         <span className="text-sm text-black font-medium">Start Date:</span>
-        <input type="date" className="px-2 py-1 text-sm rounded-md border" />
+        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="px-2 py-1 text-sm rounded-md border" />
+
         <span className="text-sm text-black font-medium">End Date:</span>
-        <input type="date" className="px-2 py-1 text-sm rounded-md border" />
+        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="px-2 py-1 text-sm rounded-md border" />
       </div>
     </div>
   );
 };
 
 
-const StationSummary = () => (
+const StationSummary = ({ lineData }) => (
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
     {/* LEFT – OEE + APQ */}
     <Card className="bg-white rounded-xl shadow">
@@ -364,12 +422,12 @@ const StationSummary = () => (
         </h3>
 
         <div className="flex justify-between items-center">
-          <CircularChart value={78} label="OEE" size={180} strokeWidth={18} />
+          <CircularChart value={lineData?.OEEPct || 0} label="OEE" size={180} strokeWidth={18} />
 
           <div className="flex gap-6">
-            <CircularChart value={65} label="A" size={110} />
-            <CircularChart value={72} label="P" size={110} />
-            <CircularChart value={92} label="Q" size={110} />
+            <CircularChart value={lineData?.AvailabilityPct || 0} label="A" size={110} />
+            <CircularChart value={lineData?.PerformancePct || 0} label="P" size={110} />
+            <CircularChart value={lineData?.QualityPct || 0} label="Q" size={110} />
           </div>
         </div>
       </CardContent>
@@ -383,11 +441,11 @@ const StationSummary = () => (
         </h3>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          <MetricCard title="Plan" value="1200" />
-          <MetricCard title="Actual" value="1100" />
-          <MetricCard title="Downtime" value="45m" />
-          <MetricCard title="Good" value="1050" />
-          <MetricCard title="Bad" value="50" />
+          <MetricCard title="Plan" value={lineData?.PlanQty || 0} />
+          <MetricCard title="Actual" value={lineData?.ActualQty || 0} />
+          <MetricCard title="Downtime" value={`${lineData?.DowntimeMin || 0}m`} />
+          <MetricCard title="Good" value={lineData?.GoodParts || 0} />
+          <MetricCard title="Bad" value={lineData?.BadParts || 0} />
         </div>
       </CardContent>
     </Card>
@@ -414,8 +472,8 @@ const M4DowntimeAnalysis = () => (
           <h4 className="font-bold mb-2 text-black text-center">Duration Wise</h4>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={downtimeData}>
-              <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+              <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+              <YAxis tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <Tooltip contentStyle={{ color: 'black' }} />
               <Bar dataKey="value" fill="#60a5fa" radius={[6, 6, 0, 0]} />
             </BarChart>
@@ -429,8 +487,8 @@ const M4DowntimeAnalysis = () => (
           <h4 className="font-bold mb-2 text-black text-center">Occurrence Wise</h4>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={downtimeData}>
-              <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+              <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+              <YAxis tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <Tooltip contentStyle={{ color: 'black' }} />
               <Bar dataKey="value" fill="#f59e0b" radius={[6, 6, 0, 0]} />
             </BarChart>
@@ -457,8 +515,8 @@ const TPMDowntimeAnalysis = () => (
               layout="vertical" // ⭐ IMPORTANT
               margin={{ left: 20 }}
             >
-              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis type="category" dataKey="name" width={80}tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+              <YAxis type="category" dataKey="name" width={80} tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <Tooltip contentStyle={{ color: 'black' }} />
               <Bar
                 dataKey="value"
@@ -481,8 +539,8 @@ const TPMDowntimeAnalysis = () => (
               layout="vertical" // ⭐ IMPORTANT
               margin={{ left: 20 }}
             >
-              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis type="category" dataKey="name" width={80} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+              <YAxis type="category" dataKey="name" width={80} tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <Tooltip contentStyle={{ color: 'black' }} />
               <Bar dataKey="value" fill="#f59e0b" radius={[0, 6, 6, 0]} />
             </BarChart>
@@ -495,32 +553,141 @@ const TPMDowntimeAnalysis = () => (
 
 const AssemblyLinePreformance = () => {
 
-    const location = useLocation();
+  const location = useLocation();
   const AssemblyLineName = location.state?.AssemblyLineName;
+  const lineID = location.state?.lineID;
+
+  const BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
+
+  const [filterType, setFilterType] = useState("SHIFT");
+  const [shift, setShift] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const [lineData, setLineData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [trendData, setTrendData] = useState([]);
+
+
+  const fetchAssemblyLineData = async () => {
+    if (!lineID) return;
+
+    try {
+      setLoading(true);
+
+      const apiFilterType =
+        startDate && endDate ? "DATERANGE" : filterType;
+
+      const response = await axios.get(
+        `${BASE_URL}/AssemblyLine/assemblyLineWise-oee-apq`,
+        {
+          params: {
+            filterType: apiFilterType,
+            lineID: lineID,
+            shift: shift || null,
+            startDate: startDate || null,
+            endDate: endDate || null,
+          },
+        }
+      );
+
+      if (response.data && response.data.length > 0) {
+        setLineData(response.data[0]);
+      } else {
+        setLineData(null);
+      }
+    } catch (error) {
+      console.error("Error fetching line data:", error);
+      setLineData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchTrendData = async () => {
+    if (!lineID) return;
+
+    try {
+      const apiFilterType =
+        startDate && endDate ? "DATERANGE" : filterType;
+
+      const response = await axios.get(
+        `${BASE_URL}/AssemblyLine/assemblyLineWise-oee-apq_Trend`,
+        {
+          params: {
+            filterType: apiFilterType,
+            lineID: lineID,
+            shift: shift || undefined,
+            startDate: startDate || undefined,
+            endDate: endDate || undefined,
+          },
+        }
+      );
+
+      if (response.data && response.data.length > 0) {
+
+        const formatted = response.data.map((item) => {
+          let label = "";
+
+          if (apiFilterType === "SHIFT" || apiFilterType === "DAY") {
+            // 🔥 Extract HH:mm directly from string (NO timezone conversion)
+            label = item.TimeStamp.substring(11, 16);
+          } else {
+            label = item.ProdDate.substring(0, 10);
+          }
+
+          return {
+            ...item,
+            label,
+          };
+        });
+
+        setTrendData(formatted);
+      }
+
+    } catch (error) {
+      console.error("Error fetching trend data:", error);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchAssemblyLineData();
+    fetchTrendData();
+  }, [filterType, shift, startDate, endDate, lineID]);
 
 
   return (
     <DashboardLayout>
       <div className="pl-6 pr-6 pb-6 space-y-8 bg-gray-100 min-h-screen">
-        <FilterBar />
-
- <div className="flex justify-center mb-6">
-  <div className="flex items-center gap-4 bg-white px-8 py-4 rounded-2xl shadow-md border border-gray-100">
-    <div className="bg-blue-100 p-3 rounded-xl">
-      <Factory className="text-blue-600 w-6 h-6" />
-    </div>
-
-    <div>
-      <h2 className="text-2xl font-bold text-gray-800">
-        {AssemblyLineName}
-      </h2>
-    </div>
-  </div>
-</div>
+        <FilterBar
+          filterType={filterType}
+          setFilterType={setFilterType}
+          shift={shift}
+          setShift={setShift}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
 
 
+        <div className="flex justify-center mb-6">
+          <div className="flex items-center gap-4 bg-white px-8 py-4 rounded-2xl shadow-md border border-gray-100">
+            <div className="bg-blue-100 p-3 rounded-xl">
+              <Factory className="text-blue-600 w-6 h-6" />
+            </div>
 
-        <StationSummary />
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">
+                {AssemblyLineName}
+              </h2>
+            </div>
+          </div>
+        </div>
+
+
+
+        <StationSummary lineData={lineData} />
 
         {/* Line Trends */}
         <div className="space-y-4">
@@ -532,11 +699,17 @@ const AssemblyLinePreformance = () => {
               title="OEE Trend"
               color="#93c5fd" // light blue
               light
+              data={trendData}
+              dataKey="OEE"
+              filterType={filterType}
             />
 
-            <TrendChart title="Availability" color="#9b83b4" />
-            <TrendChart title="Performance" color="#acb5e0" />
-            <TrendChart title="Quality" color="#c52281" />
+            <TrendChart data={trendData}
+              dataKey="Availability" filterType={filterType} title="Availability" color="#9b83b4" />
+            <TrendChart data={trendData}
+              dataKey="Performance" filterType={filterType} title="Performance" color="#acb5e0" />
+            <TrendChart data={trendData}
+              dataKey="Quality" filterType={filterType} title="Quality" color="#c52281" />
           </div>
         </div>
 
@@ -546,10 +719,10 @@ const AssemblyLinePreformance = () => {
 
         <SectionHeader title="Assembly Line Quality Planned vs Actual​" />
         <QualityHourlyChart />
-<SectionHeader title="Assembly Line Total Parts vs Rejection Part" />
+        <SectionHeader title="Assembly Line Total Parts vs Rejection Part" />
         <QualityHourlyChart2 />
         <RejectionReason />
-           
+
       </div>
     </DashboardLayout>
   );
