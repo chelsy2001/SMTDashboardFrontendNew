@@ -87,44 +87,54 @@ const RejectionReason = ({ data = [], loading }) => {
 };
 
 
-const QualityHourlyChart = ({ data }) => (
-  <Card className="bg-white rounded-xl shadow">
-    <CardContent>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hour" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
+const QualityHourlyChart = ({ data = [], loading }) => {
+  if (loading) return <div className="text-center py-6">Loading Plan vs Actual...</div>;
+  if (!data || data.length === 0) return <div className="text-center py-6">No Plan vs Actual Data Available</div>;
+  
+  return (
+    <Card className="bg-white rounded-xl shadow">
+      <CardContent>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300, fontSize: 12 }} />
+            <YAxis tick={{ fill: "#000", fontWeight: 300, fontSize: 12 }} />
+            <Tooltip contentStyle={{ color: 'black' }} />
+            <Legend />
 
-          <Line type="monotone" dataKey="expected" stroke="#25c7eb" strokeWidth={2} />
-          <Line type="monotone" dataKey="actual" stroke="#3b1d82" strokeWidth={2} />
-        </LineChart>
-      </ResponsiveContainer>
-    </CardContent>
-  </Card>
-);
+            <Line type="monotone" dataKey="expected" stroke="#25c7eb" strokeWidth={2} name="Planned" />
+            <Line type="monotone" dataKey="actual" stroke="#3b1d82" strokeWidth={2} name="Actual" />
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+};
 
 
-const QualityHourlyChart2 = ({ data }) => (
-  <Card className="bg-white rounded-xl shadow">
-    <CardContent>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hour" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
+const QualityHourlyChart2 = ({ data = [], loading }) => {
+  if (loading) return <div className="text-center py-6">Loading Good vs Rejection...</div>;
+  if (!data || data.length === 0) return <div className="text-center py-6">No Good vs Rejection Data Available</div>;
+  
+  return (
+    <Card className="bg-white rounded-xl shadow">
+      <CardContent>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300, fontSize: 12 }} />
+            <YAxis tick={{ fill: "#000", fontWeight: 300, fontSize: 12 }} />
+            <Tooltip contentStyle={{ color: 'black' }} />
+            <Legend />
 
-          <Line type="monotone" dataKey="TotalPart" stroke="#9925eb" strokeWidth={2} />
-          <Line type="monotone" dataKey="RejectedPart" stroke="#16a39e" strokeWidth={2} />
-        </LineChart>
-      </ResponsiveContainer>
-    </CardContent>
-  </Card>
-);
+            <Line type="monotone" dataKey="TotalPart" stroke="#9925eb" strokeWidth={2} name="Good Parts" />
+            <Line type="monotone" dataKey="RejectedPart" stroke="#16a39e" strokeWidth={2} name="Rejected Parts" />
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+};
 
 const metricConfig = {
   Plan: {
@@ -850,16 +860,66 @@ const fetchTrendData = async () => {
       { params }
     );
 
-    const data = response.data.data || response.data;
+    const data = response.data?.data ?? response.data ?? [];
 
     if (Array.isArray(data) && data.length > 0) {
-      const formatted = data.map((item, index) => ({
-        time: item.Hour || item.HourNo || `H${index + 1}`,
-        OEE: item.OEEPct || 0,
-        Availability: item.AvailabilityPct || 0,
-        Performance: item.PerformancePct || 0,
-        Quality: item.QualityPct || 0,
-      }));
+      const formatted = data.map((item, index) => {
+        let timeValue = `H${index + 1}`;
+        
+        // Handle different time formats based on filter type
+        if (filterType === "SHIFT") {
+          // SHIFT: Show shift time (HourSlot like "07:00", "08:00")
+          timeValue = item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
+        } else if (filterType === "DAY") {
+          // DAY: Show all three shift times (HourSlot for all shifts in the day)
+          timeValue = item.HourSlot ?? item.Hour ?? item.HourNo ?? item.TimeSlot ?? `H${index + 1}`;
+        } else if (filterType === "WEEK") {
+          // WEEK: Show only date, not time
+          timeValue = item.Date ?? item.ProdDate ?? item.Day ?? item.Week ?? item.WeekNo ?? `Week ${index + 1}`;
+          // Remove time portion if present
+          if (typeof timeValue === 'string' && timeValue.includes(' ')) {
+            timeValue = timeValue.split(' ')[0];
+          }
+          if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+            try {
+              const date = new Date(timeValue);
+              if (!isNaN(date.getTime())) {
+                const day = date.getDate();
+                const month = date.getMonth() + 1;
+                timeValue = `${day}/${month}`;
+              }
+            } catch (e) {}
+          }
+        } else if (filterType === "MONTH") {
+          // MONTH: Show only date of month, not time
+          timeValue = item.Date ?? item.ProdDate ?? item.Day ?? item.Month ?? item.MonthName ?? item.MonthNo ?? `Month ${index + 1}`;
+          // Remove time portion if present
+          if (typeof timeValue === 'string' && timeValue.includes(' ')) {
+            timeValue = timeValue.split(' ')[0];
+          }
+          if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+            try {
+              const date = new Date(timeValue);
+              if (!isNaN(date.getTime())) {
+                const day = date.getDate();
+                const month = date.getMonth() + 1;
+                timeValue = `${day}/${month}`;
+              }
+            } catch (e) {}
+          }
+        } else {
+          // Default fallback
+          timeValue = item.HourSlot ?? item.Hour ?? item.HourNo ?? item.Date ?? item.ProdDate ?? `H${index + 1}`;
+        }
+        
+        return {
+          time: timeValue,
+          OEE: item.OEEPct ?? item.OEE ?? 0,
+          Availability: item.AvailabilityPct ?? item.Availability ?? 0,
+          Performance: item.PerformancePct ?? item.Performance ?? 0,
+          Quality: item.QualityPct ?? item.Quality ?? 0,
+        };
+      });
 
       setTrendData(formatted);
     }
@@ -891,10 +951,13 @@ const fetchLineLevelOEE = async () => {
       { params }
     );
 
-    const data = response.data.data || response.data;
+    const data = response.data?.data ?? response.data ?? [];
 
     if (Array.isArray(data) && data.length > 0) {
       setLineOEEData(data[0]);
+    } else if (data && !Array.isArray(data)) {
+      // If data is object directly, use it
+      setLineOEEData(data);
     }
   } catch (error) {
     console.error("Error fetching OEE:", error);
@@ -922,17 +985,17 @@ const fetchM4Loss = async () => {
       { params }
     );
 
-    const data = response.data.data || response.data;
+    const data = response.data?.data ?? response.data ?? [];
 
     if (Array.isArray(data)) {
      const duration = data.map(item => ({
-  name: item.LossType,
-  value: item.TotalDuration || 0,
+  name: item.LossType ?? item.LossName ?? "",
+  value: item.TotalDuration ?? item.DurationMin ?? 0,
 }));
 
 const occurrence = data.map(item => ({
-  name: item.LossType,
-  value: item.Occurrence || 0,
+  name: item.LossType ?? item.LossName ?? "",
+  value: item.Occurrence ?? item.OccurrenceCount ?? 0,
 }));
 
 
@@ -963,17 +1026,17 @@ const fetchTPMLoss = async () => {
       { params }
     );
 
-    const data = response.data.data || response.data;
+    const data = response.data?.data ?? response.data ?? [];
 
     if (Array.isArray(data)) {
       const duration = data.map(item => ({
-        name: item.LossName,
-        value: item.DurationMin || 0,
+        name: item.LossName ?? item.LossType ?? "",
+        value: item.TotalDuration ?? item.DurationMin ?? 0,
       }));
 
       const occurrence = data.map(item => ({
-        name: item.LossName,
-        value: item.OccurrenceCount || 0,
+        name: item.LossName ?? item.LossType ?? "",
+        value: item.Occurrence ?? item.OccurrenceCount ?? 0,
       }));
 
       setTpmDurationData(duration);
@@ -1005,14 +1068,42 @@ const fetchPlanVsActual = async () => {
       { params }
     );
 
-    const data = response.data?.data || [];
+    const data = response.data?.data ?? response.data ?? [];
 
     if (Array.isArray(data)) {
-      const formatted = data.map((item, index) => ({
-        hour: item.Hour || item.HourNo || `H${index + 1}`,
-        expected: item.PlanQty || item.Plan || 0,
-        actual: item.ActualQty || item.Actual || 0,
-      }));
+      const formatted = data.map((item, index) => {
+        let timeValue = `H${index + 1}`;
+        
+        // Handle time based on filter type
+        if (filterType === "SHIFT" || filterType === "DAY") {
+          timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
+        } else if (filterType === "WEEK" || filterType === "MONTH") {
+          // For WEEK and MONTH, show date only
+          timeValue = item.Date ?? item.ProdDate ?? item.TimeSlot ?? item.HourSlot ?? `H${index + 1}`;
+          // Remove time portion if present
+          if (typeof timeValue === 'string' && timeValue.includes(' ')) {
+            timeValue = timeValue.split(' ')[0];
+          }
+          if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+            try {
+              const date = new Date(timeValue);
+              if (!isNaN(date.getTime())) {
+                const day = date.getDate();
+                const month = date.getMonth() + 1;
+                timeValue = `${day}/${month}`;
+              }
+            } catch (e) {}
+          }
+        } else {
+          timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
+        }
+        
+        return {
+          hour: timeValue,
+          expected: item.PlannedQty ?? item.PlanQty ?? item.Plan ?? 0,
+          actual: item.ActualQty ?? item.Actual ?? 0,
+        };
+      });
 
       setPlanActualData(formatted);
     }
@@ -1025,6 +1116,7 @@ const fetchPlanVsActual = async () => {
 };
 const fetchGoodVsRejection = async () => {
   try {
+    setLoadingQuality(true);
     const params = {
       LineID: selectedLine,
       FilterType: filterType,
@@ -1042,20 +1134,50 @@ const fetchGoodVsRejection = async () => {
       { params }
     );
 
-    const data = response.data?.data || [];
+    const data = response.data?.data ?? response.data ?? [];
 
     if (Array.isArray(data)) {
-      const formatted = data.map((item, index) => ({
-        hour: item.Hour || item.HourNo || `H${index + 1}`,
-        TotalPart: item.GoodQty || item.TotalQty || 0,
-        RejectedPart: item.RejectionQty || item.BadQty || 0,
-      }));
+      const formatted = data.map((item, index) => {
+        let timeValue = `H${index + 1}`;
+        
+        // Handle time based on filter type
+        if (filterType === "SHIFT" || filterType === "DAY") {
+          timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
+        } else if (filterType === "WEEK" || filterType === "MONTH") {
+          // For WEEK and MONTH, show date only
+          timeValue = item.Date ?? item.ProdDate ?? item.TimeSlot ?? item.HourSlot ?? `H${index + 1}`;
+          // Remove time portion if present
+          if (typeof timeValue === 'string' && timeValue.includes(' ')) {
+            timeValue = timeValue.split(' ')[0];
+          }
+          if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+            try {
+              const date = new Date(timeValue);
+              if (!isNaN(date.getTime())) {
+                const day = date.getDate();
+                const month = date.getMonth() + 1;
+                timeValue = `${day}/${month}`;
+              }
+            } catch (e) {}
+          }
+        } else {
+          timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
+        }
+        
+        return {
+          hour: timeValue,
+          TotalPart: item.GoodQty ?? item.TotalQty ?? 0,
+          RejectedPart: item.RejectionQty ?? item.BadQty ?? 0,
+        };
+      });
 
       setGoodRejectData(formatted);
     }
 
   } catch (error) {
     console.error("Good vs Rejection API error:", error);
+  } finally {
+    setLoadingQuality(false);
   }
 };
 const fetchRejectionReason = async () => {
@@ -1078,12 +1200,12 @@ const fetchRejectionReason = async () => {
       { params }
     );
 
-    const data = response.data?.data || [];
+    const data = response.data?.data ?? response.data ?? [];
 
     if (Array.isArray(data)) {
       const formatted = data.map(item => ({
-        name: item.ReasonName || item.LossName || item.RejectionReason,
-        value: item.TotalCount || item.Count || item.RejectionCount || 0,
+        name: item.Reason ?? item.ReasonName ?? item.LossName ?? item.RejectionReason ?? "",
+        value: item.ReasonCount ?? item.TotalCount ?? item.Count ?? item.RejectionCount ?? 0,
       }));
 
       setRejectionReasonData(formatted);
@@ -1167,9 +1289,9 @@ const fetchRejectionReason = async () => {
 />
 
         <SectionHeader title="Quality Planned vs Actual​" />
-        <QualityHourlyChart data={planActualData} />
+        <QualityHourlyChart data={planActualData} loading={loadingQuality} />
 <SectionHeader title="Total Parts vs Rejection Part" />
-        <QualityHourlyChart2 data={goodRejectData} />
+        <QualityHourlyChart2 data={goodRejectData} loading={loadingQuality} />
         <RejectionReason
   data={rejectionReasonData}
   loading={loadingRejection}
