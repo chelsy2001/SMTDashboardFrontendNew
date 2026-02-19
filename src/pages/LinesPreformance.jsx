@@ -604,6 +604,11 @@ const StationCards = ({
 
   if (!stationData.length)
     return <div className="text-center py-4">No Station Data</div>;
+const getColor = (val) => {
+    if (val >= 90 ) return "#16a34a";
+    if (val >=75 && val < 90) return "#f59e0b";
+    return "#dc2626";
+  };
 
   return (
     <div className="space-y-4">
@@ -614,25 +619,58 @@ const StationCards = ({
           <Card
             key={i}
             className="bg-white rounded-lg shadow cursor-pointer hover:shadow-lg transition"
-            onClick={() =>
-              navigate("/LinesStationPreformance", {
-                state: { 
-                  stationName: station.StationName,
-                  stationId: station.StationID,
-                  lineId: selectedLine
-                },
-              })
-            }
           >
             <CardContent className="space-y-2">
               <p className="font-bold text-black text-m text-center">
                 {station.StationName}
               </p>
 
-              <KpiBar label="OEE" value={station.OEEPct || 0} color="#2563eb" />
-              <KpiBar label="A" value={station.AvailabilityPct || 0} color="#16a34a" />
-              <KpiBar label="P" value={station.PerformancePct || 0} color="#f59e0b" />
-              <KpiBar label="Q" value={station.QualityPct || 0} color="#22c55e" />
+       <KpiBar 
+  label="OEE" 
+  value={station.OEEPct || 0} 
+  color={getColor(station.OEEPct || 0)} 
+/>
+
+<KpiBar 
+  label="A" 
+  value={station.AvailabilityPct || 0} 
+  color={getColor(station.AvailabilityPct || 0)} 
+/>
+
+<KpiBar 
+  label="P" 
+  value={station.PerformancePct || 0} 
+  color={getColor(station.PerformancePct || 0)} 
+/>
+
+<KpiBar 
+  label="Q" 
+  value={station.QualityPct || 0} 
+  color={getColor(station.QualityPct || 0)} 
+/>
+ {/* View Details Button */}
+    <div className="pt-3 flex justify-center">
+      <button
+        onClick={() =>
+          navigate("/LinesStationPreformance", {
+            state: {
+              stationName: station.StationName,
+              stationId: station.StationID,
+              lineId: selectedLine,
+            },
+          })
+        }
+        className="px-5 py-2 text-sm font-semibold rounded-full 
+                   bg-gradient-to-r from-blue-500 to-indigo-600 
+                   text-white shadow-md 
+                   hover:from-indigo-600 hover:to-blue-500 
+                   hover:scale-105 
+                   active:scale-95 
+                   transition-all duration-300"
+      >
+        View Details →
+      </button>
+</div>
             </CardContent>
           </Card>
         ))}
@@ -647,7 +685,7 @@ const StationCards = ({
 const M4DowntimeAnalysis = ({ durationData, occurrenceData }) => (
 
   <div className="space-y-4">
-    <SectionHeader title="M4 Downtime Analysis" />
+    <SectionHeader title="4M Downtime Analysis" />
 
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Duration */}
@@ -1218,6 +1256,12 @@ const fetchRejectionReason = async () => {
   }
 };
 
+const getColor = (val) => {
+    if (val >= 90 ) return "#16a34a";
+    if (val >=75 && val < 90) return "#f59e0b";
+    return "#dc2626";
+  };
+
   return (
     <DashboardLayout>
       <div className="pl-6 pr-6 pb-6 space-y-8 bg-gray-100 min-h-screen">
@@ -1288,9 +1332,9 @@ const fetchRejectionReason = async () => {
   occurrenceData={tpmOccurrenceData}
 />
 
-        <SectionHeader title="Quality Planned vs Actual​" />
+        <SectionHeader title=" Planned vs Actual​" />
         <QualityHourlyChart data={planActualData} loading={loadingQuality} />
-<SectionHeader title="Total Parts vs Rejection Part" />
+<SectionHeader title="Good Part vs Rejection Part" />
         <QualityHourlyChart2 data={goodRejectData} loading={loadingQuality} />
         <RejectionReason
   data={rejectionReasonData}
