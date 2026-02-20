@@ -218,6 +218,29 @@ const AssemblyLineCard = ({ lines }) => {
                 <KpiBar label="A" value={line.Availability} color="#16a34a" />
                 <KpiBar label="P" value={line.Performance} color="#f59e0b" />
                 <KpiBar label="Q" value={line.Quality} color="#22c55e" />
+               {/* View Details Button */}
+              <div className="pt-3 flex justify-center">
+                <button
+                  onClick={() =>
+                    navigate("/LinesStationPreformance", {
+                      state: {
+                        stationName: station.StationName,
+                        stationId: station.StationID,
+                        lineId: selectedLine,
+                      },
+                    })
+                  }
+                  className="px-5 py-2 text-sm font-semibold rounded-full 
+                   bg-gradient-to-r from-blue-500 to-indigo-600 
+                   text-white shadow-md 
+                   hover:from-indigo-600 hover:to-blue-500 
+                   hover:scale-105 
+                   active:scale-95 
+                   transition-all duration-300"
+                >
+                  View Details →
+                </button>
+              </div>
               </CardContent>
             </Card>
           );
