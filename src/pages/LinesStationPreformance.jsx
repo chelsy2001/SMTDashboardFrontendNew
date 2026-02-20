@@ -825,9 +825,9 @@ const LinesStationPreformance = () => {
         <M4DowntimeAnalysis durationData={m4DurationData} occurrenceData={m4OccurrenceData} loading={loadingM4} />
         <TPMDowntimeAnalysis durationData={tpmDurationData} occurrenceData={tpmOccurrenceData} loading={loadingTPM} />
 
-        <SectionHeader title="Station Quality Planned vs Actual" />
+        <SectionHeader title="Station Planned vs Actual" />
         <QualityHourlyChart data={planActualData} loading={loadingQuality} />
-        <SectionHeader title="Station Total Parts vs Rejection Part" />
+        <SectionHeader title="Station Good Part  vs Rejection Part" />
         <QualityHourlyChart2 data={goodRejectData} loading={loadingQuality} />
         <RejectionReason data={rejectionReasonData} loading={loadingRejection} />
           </>
