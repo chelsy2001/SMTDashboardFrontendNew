@@ -29,13 +29,7 @@ import { TrendingUp, Target, Clock, CheckCircle, XCircle } from "lucide-react";
 const Card = ({ children, className = "" }) => (
   <div className={`  rounded-xl shadow ${className}`}>{children}</div>
 );
-const qualityHourlyData = [
-  { hour: "08", expected: 95, actual: 92 },
-  { hour: "09", expected: 95, actual: 90 },
-  { hour: "10", expected: 95, actual: 94 },
-  { hour: "11", expected: 95, actual: 91 },
-  { hour: "12", expected: 95, actual: 93 },
-];
+
 const qualityHourlyData2 = [
   { hour: "08", TotalPart: 95, RejectedPart: 92 },
   { hour: "09", TotalPart: 95, RejectedPart: 90 },
@@ -59,14 +53,14 @@ const CardContent = ({ children, className = "" }) => (
   <div className={`p-4 ${className}`}>{children}</div>
 );
 
-const RejectionReason = () => (
+const RejectionReason = ({ data }) => (
   <>
     <SectionHeader title=" Rejection Reason Analysis" />
     <div className=" gap-6">
       <Card className="bg-white rounded-xl shadow">
         <CardContent>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={rejectionReasonData} layout="vertical">
+            <BarChart data={data} layout="vertical">
               <XAxis type="number" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <YAxis type="category" dataKey="name" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <Tooltip contentStyle={{ color: 'black' }} />
@@ -110,30 +104,82 @@ const QualityHourlyChart = () => (
   </Card>
 );
 
-const QualityHourlyChart2 = () => (
+const QualityHourlyChart2 = ({ data }) => (
   <Card className="bg-white rounded-xl shadow">
     <CardContent>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={qualityHourlyData2}>
+        <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="hour" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
-          <YAxis domain={[80, 100]} tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
-          <Tooltip contentStyle={{ color: 'black' }} />
+
+          <XAxis
+            dataKey="label"
+            interval={0}
+            angle={-45}
+            textAnchor="end"
+            height={60}
+          />
+
+          <YAxis />
+
+          <Tooltip />
           <Legend />
 
           <Line
             type="monotone"
-            dataKey="TotalPart"
-            stroke="#9925eb"
+            dataKey="GoodQty"
+            stroke="#16a34a"
             strokeWidth={2}
-            dot={false}
+            name="Good Parts"
           />
 
           <Line
             type="monotone"
-            dataKey="RejectedPart"
-            stroke="#16a39e"
+            dataKey="RejectionQty"
+            stroke="#dc2626"
             strokeWidth={2}
+            name="Rejected Parts"
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </CardContent>
+  </Card>
+);
+
+const PlanVsActualChart = ({ data }) => (
+  <Card className="bg-white rounded-xl shadow">
+    <CardContent>
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+
+          <XAxis
+            dataKey="label"
+            interval={0}
+            angle={-45}
+            textAnchor="end"
+            height={60}
+          />
+
+          <YAxis />
+
+          <Tooltip />
+
+          <Legend />
+
+          <Line
+            type="monotone"
+            dataKey="PlannedQty"
+            stroke="#25c7eb"
+            strokeWidth={2}
+            name="Planned"
+          />
+
+          <Line
+            type="monotone"
+            dataKey="ActualQty"
+            stroke="#3b1d82"
+            strokeWidth={2}
+            name="Actual"
           />
         </LineChart>
       </ResponsiveContainer>
@@ -452,16 +498,7 @@ const StationSummary = ({ lineData }) => (
   </div>
 );
 
-
-
-const downtimeData = [
-  { name: "Loss 1", value: 45 },
-  { name: "Loss 2", value: 30 },
-  { name: "Loss 3", value: 65 },
-  { name: "Loss 4", value: 20 },
-];
-
-const M4DowntimeAnalysis = () => (
+const M4DowntimeAnalysis = ({ data }) => (
   <div className="space-y-4">
     <SectionHeader title="Assembly Line M4 Downtime Analysis" />
 
@@ -471,7 +508,7 @@ const M4DowntimeAnalysis = () => (
         <CardContent>
           <h4 className="font-bold mb-2 text-black text-center">Duration Wise</h4>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={downtimeData}>
+            <BarChart data={data}>
               <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <YAxis tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <Tooltip contentStyle={{ color: 'black' }} />
@@ -486,11 +523,11 @@ const M4DowntimeAnalysis = () => (
         <CardContent>
           <h4 className="font-bold mb-2 text-black text-center">Occurrence Wise</h4>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={downtimeData}>
+            <BarChart data={data}>
               <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <YAxis tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <Tooltip contentStyle={{ color: 'black' }} />
-              <Bar dataKey="value" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="occurrence" fill="#f59e0b" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -499,64 +536,82 @@ const M4DowntimeAnalysis = () => (
   </div>
 );
 
-const TPMDowntimeAnalysis = () => (
-  <div className="space-y-4">
-    <SectionHeader title="Assembly Line TPM Downtime Analysis" />
+const TPMDowntimeAnalysis = ({ data }) => {
+  const chartHeight = Math.max(260, data.length * 35); // 35px per loss row
 
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Duration Wise */}
-      <Card className="bg-white rounded-xl shadow">
-        <CardContent>
-          <h4 className="font-bold mb-2 text-black text-center">Duration Wise</h4>
+  return (
+    <div className="space-y-4">
+      <SectionHeader title="Assembly Line TPM Downtime Analysis" />
 
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart
-              data={downtimeData}
-              layout="vertical" // ⭐ IMPORTANT
-              margin={{ left: 20 }}
-            >
-              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
-              <YAxis type="category" dataKey="name" width={80} tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
-              <Tooltip contentStyle={{ color: 'black' }} />
-              <Bar
-                dataKey="value"
-                fill="#60a5fa"
-                radius={[0, 6, 6, 0]} // right side rounded
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-      {/* Occurrence Wise */}
-      <Card className="bg-white rounded-xl shadow">
-        <CardContent>
-          <h4 className="font-bold mb-2 text-black text-center">Occurrence Wise</h4>
+        {/* Duration Wise */}
+        <Card className="bg-white rounded-xl shadow">
+          <CardContent>
+            <h4 className="font-bold mb-2 text-black text-center">Duration Wise</h4>
 
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart
-              data={downtimeData}
-              layout="vertical" // ⭐ IMPORTANT
-              margin={{ left: 20 }}
-            >
-              <XAxis type="number" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
-              <YAxis type="category" dataKey="name" width={80} tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
-              <Tooltip contentStyle={{ color: 'black' }} />
-              <Bar dataKey="value" fill="#f59e0b" radius={[0, 6, 6, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+            {/* ✅ Scroll Container */}
+            <div className="h-[260px] overflow-y-auto">
+              <ResponsiveContainer width="100%" height={chartHeight}>
+                <BarChart
+                  data={data}
+                  layout="vertical"
+                  margin={{ left: 40, right: 20 }}
+                >
+                  <XAxis type="number" />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={160} // ✅ increase width for long names
+                  />
+                  <Tooltip contentStyle={{ color: "black" }} />
+                  <Bar dataKey="value" fill="#60a5fa" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Occurrence Wise */}
+        <Card className="bg-white rounded-xl shadow">
+          <CardContent>
+            <h4 className="font-bold mb-2 text-black text-center">Occurrence Wise</h4>
+
+            {/* ✅ Scroll Container */}
+            <div className="h-[260px] overflow-y-auto">
+              <ResponsiveContainer width="100%" height={chartHeight}>
+                <BarChart
+                  data={data}
+                  layout="vertical"
+                  margin={{ left: 40, right: 20 }}
+                >
+                  <XAxis type="number" />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    width={160}
+                  />
+                  <Tooltip contentStyle={{ color: "black" }} />
+                  <Bar dataKey="occurrence" fill="#f59e0b" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+      </div>
     </div>
-  </div>
-);
+  );
+};
+ 
+
 
 const AssemblyLinePreformance = () => {
 
   const location = useLocation();
   const AssemblyLineName = location.state?.AssemblyLineName;
   const lineID = location.state?.lineID;
-
+ const lineName = location.state?.lineName;
   const BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
 
   const [filterType, setFilterType] = useState("SHIFT");
@@ -567,6 +622,11 @@ const AssemblyLinePreformance = () => {
   const [lineData, setLineData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [trendData, setTrendData] = useState([]);
+const [m4LossData, setM4LossData] = useState([]);
+const [tpmLossData, setTpmLossData] = useState([]);
+const [planActualData, setPlanActualData] = useState([]);
+const [goodRejectionData, setGoodRejectionData] = useState([]);
+const [rejectionReasonData, setRejectionReasonData] = useState([]);
 
 
   const fetchAssemblyLineData = async () => {
@@ -649,10 +709,160 @@ const AssemblyLinePreformance = () => {
     }
   };
 
+const fetchLossData = async () => {
+  if (!lineID) return;
+
+  try {
+    const apiFilterType =
+      startDate && endDate ? "DATERANGE" : filterType;
+
+    const params = {
+      FilterType: apiFilterType,
+      lineID: lineID,
+      Shift: shift || undefined,
+      StartDate: startDate || undefined,
+      EndDate: endDate || undefined,
+    };
+
+    const [m4Res, tpmRes] = await Promise.all([
+      axios.get(`${BASE_URL}/AssemblyLine/AssemblyLineWise4MLoss`, { params }),
+      axios.get(`${BASE_URL}/AssemblyLine/AssemblyLineWiseTPMLoss`, { params }),
+    ]);
+
+    // 🔥 VERY IMPORTANT FIX
+    const formattedM4 = (m4Res.data?.data || []).map(item => ({
+      name: item.LossType,
+      value: item.TotalDuration,     // for Duration chart
+      occurrence: item.Occurrence    // for Occurrence chart
+    }));
+
+    const formattedTPM = (tpmRes.data?.data || []).map(item => ({
+      name: item.LossName,
+      value: item.TotalDuration,
+      occurrence: item.Occurrence
+    }));
+
+    setM4LossData(formattedM4);
+    setTpmLossData(formattedTPM);
+
+  } catch (error) {
+    console.error("Error fetching loss data:", error);
+    setM4LossData([]);
+    setTpmLossData([]);
+  }
+};
+
+const fetchPlanVsActual = async () => {
+  if (!lineID) return;
+
+  try {
+    const apiFilterType =
+      startDate && endDate ? "DATERANGE" : filterType;
+
+    const response = await axios.get(
+      `${BASE_URL}/AssemblyLine/AssemblyLineWisePlanVsActual`,
+      {
+        params: {
+          LineID: lineID,
+          FilterType: apiFilterType,
+          Shift: shift || undefined,
+          StartDate: startDate || undefined,
+          EndDate: endDate || undefined,
+        },
+      }
+    );
+
+    const formatted = (response.data?.data || []).map(item => ({
+      ...item,
+      // 🔥 SAME X-axis logic as OEE
+      label:
+        apiFilterType === "SHIFT" || apiFilterType === "DAY"
+          ? item.TimeStamp.substring(11, 16)
+          : item.ProdDate.substring(0, 10),
+    }));
+
+    setPlanActualData(formatted);
+
+  } catch (error) {
+    console.error("Error fetching Plan vs Actual:", error);
+    setPlanActualData([]);
+  }
+};
+const fetchGoodVsRejection = async () => {
+  if (!lineID) return;
+
+  try {
+    const apiFilterType =
+      startDate && endDate ? "DATERANGE" : filterType;
+
+    const response = await axios.get(
+      `${BASE_URL}/AssemblyLine/AssemblyLineWiseGoodVsRejection1`,
+      {
+        params: {
+          LineID: lineID,
+          FilterType: apiFilterType,
+          Shift: shift || undefined,
+          StartDate: startDate || undefined,
+          EndDate: endDate || undefined,
+        },
+      }
+    );
+
+    const formatted = (response.data?.data || []).map((item) => ({
+      ...item,
+      label:
+        apiFilterType === "SHIFT" || apiFilterType === "DAY"
+          ? item.TimeStamp.substring(11, 16)  // HH:mm
+          : item.ProdDate.substring(0, 10),  // yyyy-mm-dd
+    }));
+
+    setGoodRejectionData(formatted);
+
+  } catch (error) {
+    console.error("Error fetching Good vs Rejection:", error);
+    setGoodRejectionData([]);
+  }
+};
+const fetchRejectionReason = async () => {
+  if (!lineID) return;
+
+  try {
+    const apiFilterType =
+      startDate && endDate ? "DATERANGE" : filterType;
+
+    const response = await axios.get(
+      `${BASE_URL}/AssemblyLine/AssemblyLineWiseRejectionReasonCount`,
+      {
+        params: {
+          FilterType: apiFilterType,
+          LineID: lineID,
+          Shift: shift || undefined,
+          StartDate: startDate || undefined,
+          EndDate: endDate || undefined,
+        },
+      }
+    );
+
+    const formatted = (response.data?.data || []).map((item) => ({
+      name: item.Reason,
+      value: item.ReasonCount,
+    }));
+
+    setRejectionReasonData(formatted);
+
+  } catch (error) {
+    console.error("Error fetching rejection reason:", error);
+    setRejectionReasonData([]);
+  }
+};
 
   useEffect(() => {
     fetchAssemblyLineData();
     fetchTrendData();
+    fetchLossData();
+  fetchPlanVsActual(); 
+  fetchGoodVsRejection(); 
+   fetchRejectionReason();
   }, [filterType, shift, startDate, endDate, lineID]);
 
 
@@ -679,7 +889,8 @@ const AssemblyLinePreformance = () => {
 
             <div>
               <h2 className="text-2xl font-bold text-gray-800">
-                {AssemblyLineName}
+                {/* {AssemblyLineName} */}
+                {lineName}
               </h2>
             </div>
           </div>
@@ -713,15 +924,16 @@ const AssemblyLinePreformance = () => {
           </div>
         </div>
 
-        <M4DowntimeAnalysis />
+        <M4DowntimeAnalysis data={m4LossData}/>
 
-        <TPMDowntimeAnalysis />
+        <TPMDowntimeAnalysis  data={tpmLossData}/>
 
         <SectionHeader title="Assembly Line Quality Planned vs Actual​" />
-        <QualityHourlyChart />
+        {/* <QualityHourlyChart /> */}
+        <PlanVsActualChart data={planActualData}/>
         <SectionHeader title="Assembly Line Total Parts vs Rejection Part" />
-        <QualityHourlyChart2 />
-        <RejectionReason />
+       <QualityHourlyChart2 data={goodRejectionData} />
+        <RejectionReason data={rejectionReasonData} />
 
       </div>
     </DashboardLayout>
