@@ -574,13 +574,37 @@ const LinesStationPreformance = () => {
       const res = await axios.get(`${BASE_URL}/smtStation/SMTStationHourlyAPQOEE`, { params });
       const data = res.data?.data ?? res.data ?? [];
       const formatted = Array.isArray(data)
-        ? data.map((item, i) => ({
-            time: item.Hour ?? item.HourNo ?? `H${i + 1}`,
-            OEE: item.OEEPct ?? 0,
-            Availability: item.AvailabilityPct ?? 0,
-            Performance: item.PerformancePct ?? 0,
-            Quality: item.QualityPct ?? 0,
-          }))
+        ? data.map((item, i) => {
+            // Get actual date/time from API - check multiple possible field names
+            let timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${i + 1}`;
+            
+            // If we have a date field (for WEEK/MONTH), format it properly
+            if (filterType === "WEEK" || filterType === "MONTH") {
+              timeValue = item.Date ?? item.ProdDate ?? timeValue;
+              // Format date to show only date portion
+              if (typeof timeValue === 'string' && timeValue.includes(' ')) {
+                timeValue = timeValue.split(' ')[0];
+              }
+              if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+                try {
+                  const date = new Date(timeValue);
+                  if (!isNaN(date.getTime())) {
+                    const day = date.getDate();
+                    const month = date.getMonth() + 1;
+                    timeValue = `${day}/${month}`;
+                  }
+                } catch (e) {}
+              }
+            }
+            
+            return {
+              time: timeValue,
+              OEE: item.OEEPct ?? 0,
+              Availability: item.AvailabilityPct ?? 0,
+              Performance: item.PerformancePct ?? 0,
+              Quality: item.QualityPct ?? 0,
+            };
+          })
         : [];
       setTrendData(formatted);
     } catch (err) {
@@ -634,11 +658,35 @@ const LinesStationPreformance = () => {
       const res = await axios.post(`${BASE_URL}/smtStation/SMTStationHourlyGoodVsRejection`, body);
       const data = res.data?.data ?? res.data ?? [];
       const formatted = Array.isArray(data)
-        ? data.map((item, i) => ({
-            hour: item.Hour ?? item.HourNo ?? `H${i + 1}`,
-            TotalPart: item.GoodQty ?? item.TotalQty ?? 0,
-            RejectedPart: item.RejectionQty ?? item.BadQty ?? 0,
-          }))
+        ? data.map((item, i) => {
+            // Get actual date/time from API - check multiple possible field names
+            let hourValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${i + 1}`;
+            
+            // If we have a date field (for WEEK/MONTH), format it properly
+            if (filterType === "WEEK" || filterType === "MONTH") {
+              hourValue = item.Date ?? item.ProdDate ?? hourValue;
+              // Format date to show only date portion
+              if (typeof hourValue === 'string' && hourValue.includes(' ')) {
+                hourValue = hourValue.split(' ')[0];
+              }
+              if (typeof hourValue === 'string' && hourValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+                try {
+                  const date = new Date(hourValue);
+                  if (!isNaN(date.getTime())) {
+                    const day = date.getDate();
+                    const month = date.getMonth() + 1;
+                    hourValue = `${day}/${month}`;
+                  }
+                } catch (e) {}
+              }
+            }
+            
+            return {
+              hour: hourValue,
+              TotalPart: item.GoodQty ?? item.TotalQty ?? 0,
+              RejectedPart: item.RejectionQty ?? item.BadQty ?? 0,
+            };
+          })
         : [];
       setGoodRejectData(formatted);
     } catch (err) {
@@ -656,11 +704,35 @@ const LinesStationPreformance = () => {
       const res = await axios.post(`${BASE_URL}/smtStation/SMTStationHourlyPlanVsActual`, body);
       const data = res.data?.data ?? res.data ?? [];
       const formatted = Array.isArray(data)
-        ? data.map((item, i) => ({
-            hour: item.Hour ?? item.HourNo ?? `H${i + 1}`,
-            expected: item.PlanQty ?? item.Plan ?? 0,
-            actual: item.ActualQty ?? item.Actual ?? 0,
-          }))
+        ? data.map((item, i) => {
+            // Get actual date/time from API - check multiple possible field names
+            let hourValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${i + 1}`;
+            
+            // If we have a date field (for WEEK/MONTH), format it properly
+            if (filterType === "WEEK" || filterType === "MONTH") {
+              hourValue = item.Date ?? item.ProdDate ?? hourValue;
+              // Format date to show only date portion
+              if (typeof hourValue === 'string' && hourValue.includes(' ')) {
+                hourValue = hourValue.split(' ')[0];
+              }
+              if (typeof hourValue === 'string' && hourValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+                try {
+                  const date = new Date(hourValue);
+                  if (!isNaN(date.getTime())) {
+                    const day = date.getDate();
+                    const month = date.getMonth() + 1;
+                    hourValue = `${day}/${month}`;
+                  }
+                } catch (e) {}
+              }
+            }
+            
+            return {
+              hour: hourValue,
+              expected: item.PlanQty ?? item.Plan ?? 0,
+              actual: item.ActualQty ?? item.Actual ?? 0,
+            };
+          })
         : [];
       setPlanActualData(formatted);
     } catch (err) {
@@ -753,9 +825,9 @@ const LinesStationPreformance = () => {
         <M4DowntimeAnalysis durationData={m4DurationData} occurrenceData={m4OccurrenceData} loading={loadingM4} />
         <TPMDowntimeAnalysis durationData={tpmDurationData} occurrenceData={tpmOccurrenceData} loading={loadingTPM} />
 
-        <SectionHeader title="Station Quality Planned vs Actual" />
+        <SectionHeader title="Station Planned vs Actual" />
         <QualityHourlyChart data={planActualData} loading={loadingQuality} />
-        <SectionHeader title="Station Total Parts vs Rejection Part" />
+        <SectionHeader title="Station Good Part  vs Rejection Part" />
         <QualityHourlyChart2 data={goodRejectData} loading={loadingQuality} />
         <RejectionReason data={rejectionReasonData} loading={loadingRejection} />
           </>
