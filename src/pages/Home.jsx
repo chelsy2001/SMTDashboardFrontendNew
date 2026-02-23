@@ -162,23 +162,32 @@ const TrendChart = ({
   );
 };
 
-const KpiBar = ({ label, value, color }) => (
-  <div>
-    <div className="flex justify-between text-xs mb-1">
-      <span className="text-black font-medium">{label}</span>
-      <span className="font-semibold text-black">{value.toFixed(1)}%</span>
+const KpiBar = ({ label, value, color }) => {
+  const getColor = (val) => {
+    if (val >= 90) return "#16a34a";
+    if (val >= 75 && val < 90) return "#f59e0b";
+    return "#dc2626";
+  };
+  const dynamicColor = color || getColor(value);
+
+  return (
+    <div>
+      <div className="flex justify-between text-xs mb-1">
+        <span className="text-black font-medium">{label}</span>
+        <span className="font-semibold" style={{ color: dynamicColor }}>{value.toFixed(1)}%</span>
+      </div>
+      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${value}%` }}
+          transition={{ duration: 0.8 }}
+          className="h-full rounded-full"
+          style={{ backgroundColor: dynamicColor }}
+        />
+      </div>
     </div>
-    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-      <motion.div
-        initial={{ width: 0 }}
-        animate={{ width: `${value}%` }}
-        transition={{ duration: 0.8 }}
-        className="h-full rounded-full"
-        style={{ backgroundColor: color }}
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 const LineOLESection = ({ data = [] }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-5">
@@ -201,10 +210,10 @@ const LineOLESection = ({ data = [] }) => (
             </div>
 
             {/* KPIs */}
-            <KpiBar label="OLE" value={Number(l.OEEPct || 0)} color="#2563eb" />
-            <KpiBar label="Availability" value={Number(l.AvailabilityPct || 0)} color="#16a34a" />
-            <KpiBar label="Performance" value={Number(l.PerformancePct || 0)} color="#f59e0b" />
-            <KpiBar label="Quality" value={Number(l.QualityPct || 0)} color="#22c55e" />
+              <KpiBar label="OLE" value={Number(l.OEEPct || 0)} />
+            <KpiBar label="Availability" value={Number(l.AvailabilityPct || 0)} />
+            <KpiBar label="Performance" value={Number(l.PerformancePct || 0)} />
+            <KpiBar label="Quality" value={Number(l.QualityPct || 0)} />
           </CardContent>
         </Card>
       </motion.div>
