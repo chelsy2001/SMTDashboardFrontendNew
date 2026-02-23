@@ -44,9 +44,9 @@ const RejectionReason = ({ data = [], loading }) => {
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={data} layout="vertical">
               <XAxis type="number" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis type="category" dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
+              <YAxis type="category" dataKey="name" width={150} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }} />
               <Tooltip contentStyle={{ color: 'black' }}/>
-              <Bar dataKey="value" fill="#60a5fa" radius={[6, 6, 0, 0]}/>
+              <Bar dataKey="value" fill="#60a5fa" radius={[0, 6, 6, 0]}/>
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -751,8 +751,8 @@ const LinesStationPreformance = () => {
       const data = res.data?.data ?? res.data ?? [];
       const formatted = Array.isArray(data)
         ? data.map((item) => ({
-            name: item.ReasonName ?? item.LossName ?? item.RejectionReason ?? "",
-            value: item.TotalCount ?? item.Count ?? item.RejectionCount ?? 0,
+            name: item.Reason ?? item.ReasonName ?? item.LossName ?? item.RejectionReason ?? "",
+            value: item.ReasonCount ?? item.TotalCount ?? item.Count ?? item.RejectionCount ?? 0,
           }))
         : [];
       setRejectionReasonData(formatted);
