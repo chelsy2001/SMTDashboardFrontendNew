@@ -11,8 +11,13 @@ function DropdownProfile({ align }) {
 
   // Get user details from localStorage
   const storedUser = JSON.parse(localStorage.getItem("user"));
-  const username = storedUser?.Username || "Guest";
-  const userId = storedUser?.UserID || "N/A";
+  
+  // Handle various API response formats
+  // The user object could be stored directly or nested under 'user' property
+  const userData = storedUser?.user || storedUser;
+  
+  const username = userData?.Username || userData?.username || userData?.name || "Guest";
+  const userId = userData?.UserID || userData?.userId || userData?.id || "N/A";
 
   // Sign Out handler
   const handleSignOut = () => {
