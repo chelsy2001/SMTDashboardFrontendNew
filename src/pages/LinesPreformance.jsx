@@ -1,4 +1,4 @@
-import { React, useState , useEffect } from "react";
+import { React, useState, useEffect } from "react";
 import DashboardLayout from "../partials/DashboardLayout";
 
 import { motion } from "framer-motion";
@@ -90,7 +90,7 @@ const RejectionReason = ({ data = [], loading }) => {
 const QualityHourlyChart = ({ data = [], loading }) => {
   if (loading) return <div className="text-center py-6">Loading Plan vs Actual...</div>;
   if (!data || data.length === 0) return <div className="text-center py-6">No Plan vs Actual Data Available</div>;
-  
+
   return (
     <Card className="bg-white rounded-xl shadow">
       <CardContent>
@@ -115,7 +115,7 @@ const QualityHourlyChart = ({ data = [], loading }) => {
 const QualityHourlyChart2 = ({ data = [], loading }) => {
   if (loading) return <div className="text-center py-6">Loading Good vs Rejection...</div>;
   if (!data || data.length === 0) return <div className="text-center py-6">No Good vs Rejection Data Available</div>;
-  
+
   return (
     <Card className="bg-white rounded-xl shadow">
       <CardContent>
@@ -171,9 +171,9 @@ const trendData = Array.from({ length: 8 }, (_, i) => ({
 
 /* ---------- Circular Chart ---------- */
 const CircularChart = ({ value, label, size = 120, strokeWidth = 12 }) => {
- const getColor = (val) => {
-    if (val >= 90 ) return "#16a34a";
-    if (val >=75 && val < 90) return "#f59e0b";
+  const getColor = (val) => {
+    if (val >= 90) return "#16a34a";
+    if (val >= 75 && val < 90) return "#f59e0b";
     return "#dc2626";
   };
 
@@ -274,8 +274,8 @@ const TrendChart = ({
               </linearGradient>
             </defs>
 
-            <XAxis dataKey="time" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-            <YAxis domain={[0, 100]} tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+            <XAxis dataKey="time" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+            <YAxis domain={[0, 100]} tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
             <Tooltip contentStyle={{ color: 'black' }} />
 
             <Area
@@ -387,7 +387,7 @@ const LineSelector = ({ setSelectedLine }) => {
   const [activeLine, setActiveLine] = useState(null);
   const [loading, setLoading] = useState(false);
 
-   const sliderSettings = {
+  const sliderSettings = {
     dots: false,
     infinite: false,
     speed: 400,
@@ -436,45 +436,44 @@ const LineSelector = ({ setSelectedLine }) => {
   }
 
   return (
-  <div className="bg-white rounded-2xl shadow px-10 py-6">
-    <div className="text-center mb-4">
-      <h3 className="font-semibold text-black text-lg">
-        Line Selection
-      </h3>
-    </div>
+    <div className="bg-white rounded-2xl shadow px-10 py-6">
+      <div className="text-center mb-4">
+        <h3 className="font-semibold text-black text-lg">
+          Line Selection
+        </h3>
+      </div>
 
-    <div className="relative px-8">
-      <Slider {...sliderSettings}>
-        {Array.isArray(lines) &&
-          lines.map((line) => {
-            const isActive = activeLine === line.LineID;
+      <div className="relative px-8">
+        <Slider {...sliderSettings}>
+          {Array.isArray(lines) &&
+            lines.map((line) => {
+              const isActive = activeLine === line.LineID;
 
-            return (
-              <div key={line.LineID} className="px-2">
-                <button
-                  onClick={() => {
-                    setActiveLine(line.LineID);
-                    if (setSelectedLine) {
-                      setSelectedLine(line.LineID);
-                    }
-                  }}
-                  className={`w-full px-5 py-2 rounded-full text-sm font-semibold transition
-                    ${
-                      isActive
+              return (
+                <div key={line.LineID} className="px-2">
+                  <button
+                    onClick={() => {
+                      setActiveLine(line.LineID);
+                      if (setSelectedLine) {
+                        setSelectedLine(line.LineID);
+                      }
+                    }}
+                    className={`w-full px-5 py-2 rounded-full text-sm font-semibold transition
+                    ${isActive
                         ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
                         : "bg-gray-100 text-gray-700 hover:bg-blue-50"
-                    }
+                      }
                   `}
-                >
-                  {line.LineName}
-                </button>
-              </div>
-            );
-          })}
-      </Slider>
+                  >
+                    {line.LineName}
+                  </button>
+                </div>
+              );
+            })}
+        </Slider>
+      </div>
     </div>
-  </div>
-);
+  );
 
 };
 
@@ -517,13 +516,13 @@ const LineSummary = ({ data, loading }) => {
           </h3>
 
           <div className="flex justify-between items-center">
-          <CircularChart value={data.OEEPct || 0} label="OEE" size={180} strokeWidth={18} />
+            <CircularChart value={data.OEEPct || 0} label="OEE" size={180} strokeWidth={18} />
 
-          <div className="flex gap-6 ">
-            <CircularChart value={data.AvailabilityPct || 0} label="A" size={110} />
-            <CircularChart value={data.PerformancePct || 0} label="P" size={110} />
-            <CircularChart value={data.QualityPct || 0} label="Q" size={110} />
-          </div>
+            <div className="flex gap-6 ">
+              <CircularChart value={data.AvailabilityPct || 0} label="A" size={110} />
+              <CircularChart value={data.PerformancePct || 0} label="P" size={110} />
+              <CircularChart value={data.QualityPct || 0} label="Q" size={110} />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -604,9 +603,9 @@ const StationCards = ({
 
   if (!stationData.length)
     return <div className="text-center py-4">No Station Data</div>;
-const getColor = (val) => {
-    if (val >= 90 ) return "#16a34a";
-    if (val >=75 && val < 90) return "#f59e0b";
+  const getColor = (val) => {
+    if (val >= 90) return "#16a34a";
+    if (val >= 75 && val < 90) return "#f59e0b";
     return "#dc2626";
   };
 
@@ -625,52 +624,52 @@ const getColor = (val) => {
                 {station.StationName}
               </p>
 
-       <KpiBar 
-  label="OEE" 
-  value={station.OEEPct || 0} 
-  color={getColor(station.OEEPct || 0)} 
-/>
+              <KpiBar
+                label="OEE"
+                value={station.OEEPct || 0}
+                color={getColor(station.OEEPct || 0)}
+              />
 
-<KpiBar 
-  label="A" 
-  value={station.AvailabilityPct || 0} 
-  color={getColor(station.AvailabilityPct || 0)} 
-/>
+              <KpiBar
+                label="A"
+                value={station.AvailabilityPct || 0}
+                color={getColor(station.AvailabilityPct || 0)}
+              />
 
-<KpiBar 
-  label="P" 
-  value={station.PerformancePct || 0} 
-  color={getColor(station.PerformancePct || 0)} 
-/>
+              <KpiBar
+                label="P"
+                value={station.PerformancePct || 0}
+                color={getColor(station.PerformancePct || 0)}
+              />
 
-<KpiBar 
-  label="Q" 
-  value={station.QualityPct || 0} 
-  color={getColor(station.QualityPct || 0)} 
-/>
- {/* View Details Button */}
-    <div className="pt-3 flex justify-center">
-      <button
-        onClick={() =>
-          navigate("/LinesStationPreformance", {
-            state: {
-              stationName: station.StationName,
-              stationId: station.StationID,
-              lineId: selectedLine,
-            },
-          })
-        }
-        className="px-5 py-2 text-sm font-semibold rounded-full 
+              <KpiBar
+                label="Q"
+                value={station.QualityPct || 0}
+                color={getColor(station.QualityPct || 0)}
+              />
+              {/* View Details Button */}
+              <div className="pt-3 flex justify-center">
+                <button
+                  onClick={() =>
+                    navigate("/LinesStationPreformance", {
+                      state: {
+                        stationName: station.StationName,
+                        stationId: station.StationID,
+                        lineId: selectedLine,
+                      },
+                    })
+                  }
+                  className="px-5 py-2 text-sm font-semibold rounded-full 
                    bg-gradient-to-r from-blue-500 to-indigo-600 
                    text-white shadow-md 
                    hover:from-indigo-600 hover:to-blue-500 
                    hover:scale-105 
                    active:scale-95 
                    transition-all duration-300"
-      >
-        View Details →
-      </button>
-</div>
+                >
+                  View Details →
+                </button>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -694,8 +693,8 @@ const M4DowntimeAnalysis = ({ durationData, occurrenceData }) => (
           <h4 className="font-bold mb-2 text-black text-center">Duration Wise</h4>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={durationData}>
-              <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+              <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+              <YAxis tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <Tooltip contentStyle={{ color: 'black' }} />
               <Bar dataKey="value" fill="#60a5fa" radius={[6, 6, 0, 0]} />
             </BarChart>
@@ -709,8 +708,8 @@ const M4DowntimeAnalysis = ({ durationData, occurrenceData }) => (
           <h4 className="font-bold mb-2 text-black text-center">Occurrence Wise</h4>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={occurrenceData}>
-              <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
-              <YAxis tick={{ fill: "#000", fontWeight: 300 , fontSize: 14 }}/>
+              <XAxis dataKey="name" tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
+              <YAxis tick={{ fill: "#000", fontWeight: 300, fontSize: 14 }} />
               <Tooltip contentStyle={{ color: 'black' }} />
               <Bar dataKey="value" fill="#f59e0b" radius={[6, 6, 0, 0]} />
             </BarChart>
@@ -810,462 +809,462 @@ const LinesPreformance = () => {
   const [endDate, setEndDate] = useState("");
   const [selectedLine, setSelectedLine] = useState(null);
   const [lineOEEData, setLineOEEData] = useState(null);
-const [loadingOEE, setLoadingOEE] = useState(false);
-const [trendData, setTrendData] = useState([]);
-const [loadingTrend, setLoadingTrend] = useState(false);
-const [m4DurationData, setM4DurationData] = useState([]);
-const [m4OccurrenceData, setM4OccurrenceData] = useState([]);
-const [tpmDurationData, setTpmDurationData] = useState([]);
-const [tpmOccurrenceData, setTpmOccurrenceData] = useState([]);
-const [planActualData, setPlanActualData] = useState([]);
-const [goodRejectData, setGoodRejectData] = useState([]);
-const [loadingQuality, setLoadingQuality] = useState(false);
-const [rejectionReasonData, setRejectionReasonData] = useState([]);
-const [loadingRejection, setLoadingRejection] = useState(false);
-const [stationData, setStationData] = useState([]);
-const [loading, setLoading] = useState(true);
+  const [loadingOEE, setLoadingOEE] = useState(false);
+  const [trendData, setTrendData] = useState([]);
+  const [loadingTrend, setLoadingTrend] = useState(false);
+  const [m4DurationData, setM4DurationData] = useState([]);
+  const [m4OccurrenceData, setM4OccurrenceData] = useState([]);
+  const [tpmDurationData, setTpmDurationData] = useState([]);
+  const [tpmOccurrenceData, setTpmOccurrenceData] = useState([]);
+  const [planActualData, setPlanActualData] = useState([]);
+  const [goodRejectData, setGoodRejectData] = useState([]);
+  const [loadingQuality, setLoadingQuality] = useState(false);
+  const [rejectionReasonData, setRejectionReasonData] = useState([]);
+  const [loadingRejection, setLoadingRejection] = useState(false);
+  const [stationData, setStationData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const fetchStations = async () => {
+  useEffect(() => {
+    const fetchStations = async () => {
+      try {
+        const res = await axios.get("/api/stations"); // apna API lagao
+        const data = res.data?.data ?? res.data ?? [];
+        setStationData(data);
+      } catch (err) {
+        console.error("Station API error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStations();
+  }, []);
+
+
+  useEffect(() => {
+    if (selectedLine) {
+      fetchPlanVsActual();
+      fetchGoodVsRejection();
+    }
+  }, [selectedLine, filterType, shift, startDate, endDate]);
+
+
+  useEffect(() => {
+    if (selectedLine) {
+      fetchM4Loss();
+      fetchTPMLoss();
+    }
+  }, [selectedLine, filterType, shift, startDate, endDate]);
+
+
+  useEffect(() => {
+    if (selectedLine) {
+      fetchLineLevelOEE();
+    }
+  }, [selectedLine, filterType, shift, startDate, endDate]);
+
+  useEffect(() => {
+    if (selectedLine) {
+      fetchTrendData();
+    }
+  }, [selectedLine, filterType, shift, startDate, endDate]);
+
+  useEffect(() => {
+    if (selectedLine) {
+      fetchRejectionReason();
+    }
+  }, [selectedLine, filterType, shift, startDate, endDate]);
+
+
+  const fetchTrendData = async () => {
     try {
-      const res = await axios.get("/api/stations"); // apna API lagao
-      const data = res.data?.data ?? res.data ?? [];
-      setStationData(data);
-    } catch (err) {
-      console.error("Station API error:", err);
+      setLoadingTrend(true);
+
+      const params = {
+        LineID: selectedLine,
+        FilterType: filterType,
+      };
+
+      if (shift) params.Shift = shift;
+
+      if (filterType === "DATERANGE") {
+        params.StartDate = startDate;
+        params.EndDate = endDate;
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/smtLine/SMTLineWiseHourlyOEE`,
+        { params }
+      );
+
+      const data = response.data?.data ?? response.data ?? [];
+
+      if (Array.isArray(data) && data.length > 0) {
+        const formatted = data.map((item, index) => {
+          let timeValue = `H${index + 1}`;
+
+          // Handle different time formats based on filter type
+          if (filterType === "SHIFT") {
+            // SHIFT: Show shift time (HourSlot like "07:00", "08:00")
+            timeValue = item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
+          } else if (filterType === "DAY") {
+            // DAY: Show all three shift times (HourSlot for all shifts in the day)
+            timeValue = item.HourSlot ?? item.Hour ?? item.HourNo ?? item.TimeSlot ?? `H${index + 1}`;
+          } else if (filterType === "WEEK") {
+            // WEEK: Show only date, not time
+            timeValue = item.Date ?? item.ProdDate ?? item.Day ?? item.Week ?? item.WeekNo ?? `Week ${index + 1}`;
+            // Remove time portion if present
+            if (typeof timeValue === 'string' && timeValue.includes(' ')) {
+              timeValue = timeValue.split(' ')[0];
+            }
+            if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+              try {
+                const date = new Date(timeValue);
+                if (!isNaN(date.getTime())) {
+                  const day = date.getDate();
+                  const month = date.getMonth() + 1;
+                  timeValue = `${day}/${month}`;
+                }
+              } catch (e) { }
+            }
+          } else if (filterType === "MONTH") {
+            // MONTH: Show only date of month, not time
+            timeValue = item.Date ?? item.ProdDate ?? item.Day ?? item.Month ?? item.MonthName ?? item.MonthNo ?? `Month ${index + 1}`;
+            // Remove time portion if present
+            if (typeof timeValue === 'string' && timeValue.includes(' ')) {
+              timeValue = timeValue.split(' ')[0];
+            }
+            if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+              try {
+                const date = new Date(timeValue);
+                if (!isNaN(date.getTime())) {
+                  const day = date.getDate();
+                  const month = date.getMonth() + 1;
+                  timeValue = `${day}/${month}`;
+                }
+              } catch (e) { }
+            }
+          } else {
+            // Default fallback
+            timeValue = item.HourSlot ?? item.Hour ?? item.HourNo ?? item.Date ?? item.ProdDate ?? `H${index + 1}`;
+          }
+
+          return {
+            time: timeValue,
+            OEE: item.OEEPct ?? item.OEE ?? 0,
+            Availability: item.AvailabilityPct ?? item.Availability ?? 0,
+            Performance: item.PerformancePct ?? item.Performance ?? 0,
+            Quality: item.QualityPct ?? item.Quality ?? 0,
+          };
+        });
+
+        setTrendData(formatted);
+      }
+    } catch (error) {
+      console.error("Error fetching trend data:", error);
     } finally {
-      setLoading(false);
+      setLoadingTrend(false);
     }
   };
 
-  fetchStations();
-}, []);
 
+  const fetchLineLevelOEE = async () => {
+    try {
+      setLoadingOEE(true);
 
-useEffect(() => {
-  if (selectedLine) {
-    fetchPlanVsActual();
-    fetchGoodVsRejection();
-  }
-}, [selectedLine, filterType, shift, startDate, endDate]);
+      const params = {
+        LineID: selectedLine,
+        FilterType: filterType,
+      };
 
+      if (shift) params.Shift = shift;
+      if (filterType === "DATERANGE") {
+        params.StartDate = startDate;
+        params.EndDate = endDate;
+      }
 
-useEffect(() => {
-  if (selectedLine) {
-    fetchM4Loss();
-    fetchTPMLoss();
-  }
-}, [selectedLine, filterType, shift, startDate, endDate]);
-  
+      const response = await axios.get(
+        `${BASE_URL}/smtLine/LineLevelOEE`,
+        { params }
+      );
 
-useEffect(() => {
-  if (selectedLine) {
-    fetchLineLevelOEE();
-  }
-}, [selectedLine, filterType, shift, startDate, endDate]);
+      const data = response.data?.data ?? response.data ?? [];
 
-useEffect(() => {
-  if (selectedLine) {
-    fetchTrendData();
-  }
-}, [selectedLine, filterType, shift, startDate, endDate]);
-
-useEffect(() => {
-  if (selectedLine) {
-    fetchRejectionReason();
-  }
-}, [selectedLine, filterType, shift, startDate, endDate]);
-
-
-const fetchTrendData = async () => {
-  try {
-    setLoadingTrend(true);
-
-    const params = {
-      LineID: selectedLine,
-      FilterType: filterType,
-    };
-
-    if (shift) params.Shift = shift;
-
-    if (filterType === "DATERANGE") {
-      params.StartDate = startDate;
-      params.EndDate = endDate;
+      if (Array.isArray(data) && data.length > 0) {
+        setLineOEEData(data[0]);
+      } else if (data && !Array.isArray(data)) {
+        // If data is object directly, use it
+        setLineOEEData(data);
+      }
+    } catch (error) {
+      console.error("Error fetching OEE:", error);
+    } finally {
+      setLoadingOEE(false);
     }
+  };
 
-    const response = await axios.get(
-      `${BASE_URL}/smtLine/SMTLineWiseHourlyOEE`,
-      { params }
-    );
+  const fetchM4Loss = async () => {
+    try {
+      const params = {
+        LineID: selectedLine,
+        FilterType: filterType,
+      };
 
-    const data = response.data?.data ?? response.data ?? [];
+      if (shift) params.Shift = shift;
 
-    if (Array.isArray(data) && data.length > 0) {
-      const formatted = data.map((item, index) => {
-        let timeValue = `H${index + 1}`;
-        
-        // Handle different time formats based on filter type
-        if (filterType === "SHIFT") {
-          // SHIFT: Show shift time (HourSlot like "07:00", "08:00")
-          timeValue = item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
-        } else if (filterType === "DAY") {
-          // DAY: Show all three shift times (HourSlot for all shifts in the day)
-          timeValue = item.HourSlot ?? item.Hour ?? item.HourNo ?? item.TimeSlot ?? `H${index + 1}`;
-        } else if (filterType === "WEEK") {
-          // WEEK: Show only date, not time
-          timeValue = item.Date ?? item.ProdDate ?? item.Day ?? item.Week ?? item.WeekNo ?? `Week ${index + 1}`;
-          // Remove time portion if present
-          if (typeof timeValue === 'string' && timeValue.includes(' ')) {
-            timeValue = timeValue.split(' ')[0];
+      if (filterType === "DATERANGE") {
+        params.StartDate = startDate;
+        params.EndDate = endDate;
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/smtLine/SMTLineWise4MLoss`,
+        { params }
+      );
+
+      const data = response.data?.data ?? response.data ?? [];
+
+      if (Array.isArray(data)) {
+        const duration = data.map(item => ({
+          name: item.LossType ?? item.LossName ?? "",
+          value: item.TotalDuration ?? item.DurationMin ?? 0,
+        }));
+
+        const occurrence = data.map(item => ({
+          name: item.LossType ?? item.LossName ?? "",
+          value: item.Occurrence ?? item.OccurrenceCount ?? 0,
+        }));
+
+
+        setM4DurationData(duration);
+        setM4OccurrenceData(occurrence);
+      }
+    } catch (error) {
+      console.error("M4 Loss API error:", error);
+    }
+  };
+
+  const fetchTPMLoss = async () => {
+    try {
+      const params = {
+        LineID: selectedLine,
+        FilterType: filterType,
+      };
+
+      if (shift) params.Shift = shift;
+
+      if (filterType === "DATERANGE") {
+        params.StartDate = startDate;
+        params.EndDate = endDate;
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/smtLine/SMTLineWiseTPMLoss`,
+        { params }
+      );
+
+      const data = response.data?.data ?? response.data ?? [];
+
+      if (Array.isArray(data)) {
+        const duration = data.map(item => ({
+          name: item.LossName ?? item.LossType ?? "",
+          value: item.TotalDuration ?? item.DurationMin ?? 0,
+        }));
+
+        const occurrence = data.map(item => ({
+          name: item.LossName ?? item.LossType ?? "",
+          value: item.Occurrence ?? item.OccurrenceCount ?? 0,
+        }));
+
+        setTpmDurationData(duration);
+        setTpmOccurrenceData(occurrence);
+      }
+    } catch (error) {
+      console.error("TPM Loss API error:", error);
+    }
+  };
+
+  const fetchPlanVsActual = async () => {
+    try {
+      setLoadingQuality(true);
+
+      const params = {
+        LineID: selectedLine,
+        FilterType: filterType,
+      };
+
+      if (shift) params.Shift = shift;
+
+      if (filterType === "DATERANGE") {
+        params.StartDate = startDate;
+        params.EndDate = endDate;
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/smtLine/SMTLinePlanVsActual`,
+        { params }
+      );
+
+      const data = response.data?.data ?? response.data ?? [];
+
+      if (Array.isArray(data)) {
+        const formatted = data.map((item, index) => {
+          let timeValue = `H${index + 1}`;
+
+          // Handle time based on filter type
+          if (filterType === "SHIFT" || filterType === "DAY") {
+            timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
+          } else if (filterType === "WEEK" || filterType === "MONTH") {
+            // For WEEK and MONTH, show date only
+            timeValue = item.Date ?? item.ProdDate ?? item.TimeSlot ?? item.HourSlot ?? `H${index + 1}`;
+            // Remove time portion if present
+            if (typeof timeValue === 'string' && timeValue.includes(' ')) {
+              timeValue = timeValue.split(' ')[0];
+            }
+            if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+              try {
+                const date = new Date(timeValue);
+                if (!isNaN(date.getTime())) {
+                  const day = date.getDate();
+                  const month = date.getMonth() + 1;
+                  timeValue = `${day}/${month}`;
+                }
+              } catch (e) { }
+            }
+          } else {
+            timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
           }
-          if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
-            try {
-              const date = new Date(timeValue);
-              if (!isNaN(date.getTime())) {
-                const day = date.getDate();
-                const month = date.getMonth() + 1;
-                timeValue = `${day}/${month}`;
-              }
-            } catch (e) {}
+
+          return {
+            hour: timeValue,
+            expected: item.PlannedQty ?? item.PlanQty ?? item.Plan ?? 0,
+            actual: item.ActualQty ?? item.Actual ?? 0,
+          };
+        });
+
+        setPlanActualData(formatted);
+      }
+
+    } catch (error) {
+      console.error("Plan vs Actual API error:", error);
+    } finally {
+      setLoadingQuality(false);
+    }
+  };
+  const fetchGoodVsRejection = async () => {
+    try {
+      setLoadingQuality(true);
+      const params = {
+        LineID: selectedLine,
+        FilterType: filterType,
+      };
+
+      if (shift) params.Shift = shift;
+
+      if (filterType === "DATERANGE") {
+        params.StartDate = startDate;
+        params.EndDate = endDate;
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/smtLine/SMTLineGoodVsRejection`,
+        { params }
+      );
+
+      const data = response.data?.data ?? response.data ?? [];
+
+      if (Array.isArray(data)) {
+        const formatted = data.map((item, index) => {
+          let timeValue = `H${index + 1}`;
+
+          // Handle time based on filter type
+          if (filterType === "SHIFT" || filterType === "DAY") {
+            timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
+          } else if (filterType === "WEEK" || filterType === "MONTH") {
+            // For WEEK and MONTH, show date only
+            timeValue = item.Date ?? item.ProdDate ?? item.TimeSlot ?? item.HourSlot ?? `H${index + 1}`;
+            // Remove time portion if present
+            if (typeof timeValue === 'string' && timeValue.includes(' ')) {
+              timeValue = timeValue.split(' ')[0];
+            }
+            if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
+              try {
+                const date = new Date(timeValue);
+                if (!isNaN(date.getTime())) {
+                  const day = date.getDate();
+                  const month = date.getMonth() + 1;
+                  timeValue = `${day}/${month}`;
+                }
+              } catch (e) { }
+            }
+          } else {
+            timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
           }
-        } else if (filterType === "MONTH") {
-          // MONTH: Show only date of month, not time
-          timeValue = item.Date ?? item.ProdDate ?? item.Day ?? item.Month ?? item.MonthName ?? item.MonthNo ?? `Month ${index + 1}`;
-          // Remove time portion if present
-          if (typeof timeValue === 'string' && timeValue.includes(' ')) {
-            timeValue = timeValue.split(' ')[0];
-          }
-          if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
-            try {
-              const date = new Date(timeValue);
-              if (!isNaN(date.getTime())) {
-                const day = date.getDate();
-                const month = date.getMonth() + 1;
-                timeValue = `${day}/${month}`;
-              }
-            } catch (e) {}
-          }
-        } else {
-          // Default fallback
-          timeValue = item.HourSlot ?? item.Hour ?? item.HourNo ?? item.Date ?? item.ProdDate ?? `H${index + 1}`;
-        }
-        
-        return {
-          time: timeValue,
-          OEE: item.OEEPct ?? item.OEE ?? 0,
-          Availability: item.AvailabilityPct ?? item.Availability ?? 0,
-          Performance: item.PerformancePct ?? item.Performance ?? 0,
-          Quality: item.QualityPct ?? item.Quality ?? 0,
-        };
-      });
 
-      setTrendData(formatted);
+          return {
+            hour: timeValue,
+            TotalPart: item.GoodQty ?? item.TotalQty ?? 0,
+            RejectedPart: item.RejectionQty ?? item.BadQty ?? 0,
+          };
+        });
+
+        setGoodRejectData(formatted);
+      }
+
+    } catch (error) {
+      console.error("Good vs Rejection API error:", error);
+    } finally {
+      setLoadingQuality(false);
     }
-  } catch (error) {
-    console.error("Error fetching trend data:", error);
-  } finally {
-    setLoadingTrend(false);
-  }
-};
+  };
+  const fetchRejectionReason = async () => {
+    try {
+      setLoadingRejection(true);
 
+      const params = {
+        LineID: selectedLine,
+        FilterType: filterType,
+      };
 
-const fetchLineLevelOEE = async () => {
-  try {
-    setLoadingOEE(true);
+      if (shift) params.Shift = shift;
+      if (filterType === "DATERANGE") {
+        params.StartDate = startDate;
+        params.EndDate = endDate;
+      }
 
-    const params = {
-      LineID: selectedLine,
-      FilterType: filterType,
-    };
+      const response = await axios.get(
+        `${BASE_URL}/smtLine/SMTLineRejectionReason`,
+        { params }
+      );
 
-    if (shift) params.Shift = shift;
-    if (filterType === "DATERANGE") {
-      params.StartDate = startDate;
-      params.EndDate = endDate;
+      const data = response.data?.data ?? response.data ?? [];
+
+      if (Array.isArray(data)) {
+        const formatted = data.map(item => ({
+          name: item.Reason ?? item.ReasonName ?? item.LossName ?? item.RejectionReason ?? "",
+          value: item.ReasonCount ?? item.TotalCount ?? item.Count ?? item.RejectionCount ?? 0,
+        }));
+
+        setRejectionReasonData(formatted);
+      }
+
+    } catch (error) {
+      console.error("Rejection Reason API error:", error);
+    } finally {
+      setLoadingRejection(false);
     }
+  };
 
-    const response = await axios.get(
-      `${BASE_URL}/smtLine/LineLevelOEE`,
-      { params }
-    );
-
-    const data = response.data?.data ?? response.data ?? [];
-
-    if (Array.isArray(data) && data.length > 0) {
-      setLineOEEData(data[0]);
-    } else if (data && !Array.isArray(data)) {
-      // If data is object directly, use it
-      setLineOEEData(data);
-    }
-  } catch (error) {
-    console.error("Error fetching OEE:", error);
-  } finally {
-    setLoadingOEE(false);
-  }
-};
-
-const fetchM4Loss = async () => {
-  try {
-    const params = {
-      LineID: selectedLine,
-      FilterType: filterType,
-    };
-
-    if (shift) params.Shift = shift;
-
-    if (filterType === "DATERANGE") {
-      params.StartDate = startDate;
-      params.EndDate = endDate;
-    }
-
-    const response = await axios.get(
-      `${BASE_URL}/smtLine/SMTLineWise4MLoss`,
-      { params }
-    );
-
-    const data = response.data?.data ?? response.data ?? [];
-
-    if (Array.isArray(data)) {
-     const duration = data.map(item => ({
-  name: item.LossType ?? item.LossName ?? "",
-  value: item.TotalDuration ?? item.DurationMin ?? 0,
-}));
-
-const occurrence = data.map(item => ({
-  name: item.LossType ?? item.LossName ?? "",
-  value: item.Occurrence ?? item.OccurrenceCount ?? 0,
-}));
-
-
-      setM4DurationData(duration);
-      setM4OccurrenceData(occurrence);
-    }
-  } catch (error) {
-    console.error("M4 Loss API error:", error);
-  }
-};
-
-const fetchTPMLoss = async () => {
-  try {
-    const params = {
-      LineID: selectedLine,
-      FilterType: filterType,
-    };
-
-    if (shift) params.Shift = shift;
-
-    if (filterType === "DATERANGE") {
-      params.StartDate = startDate;
-      params.EndDate = endDate;
-    }
-
-    const response = await axios.get(
-      `${BASE_URL}/smtLine/SMTLineWiseTPMLoss`,
-      { params }
-    );
-
-    const data = response.data?.data ?? response.data ?? [];
-
-    if (Array.isArray(data)) {
-      const duration = data.map(item => ({
-        name: item.LossName ?? item.LossType ?? "",
-        value: item.TotalDuration ?? item.DurationMin ?? 0,
-      }));
-
-      const occurrence = data.map(item => ({
-        name: item.LossName ?? item.LossType ?? "",
-        value: item.Occurrence ?? item.OccurrenceCount ?? 0,
-      }));
-
-      setTpmDurationData(duration);
-      setTpmOccurrenceData(occurrence);
-    }
-  } catch (error) {
-    console.error("TPM Loss API error:", error);
-  }
-};
-
-const fetchPlanVsActual = async () => {
-  try {
-    setLoadingQuality(true);
-
-    const params = {
-      LineID: selectedLine,
-      FilterType: filterType,
-    };
-
-    if (shift) params.Shift = shift;
-
-    if (filterType === "DATERANGE") {
-      params.StartDate = startDate;
-      params.EndDate = endDate;
-    }
-
-    const response = await axios.get(
-      `${BASE_URL}/smtLine/SMTLinePlanVsActual`,
-      { params }
-    );
-
-    const data = response.data?.data ?? response.data ?? [];
-
-    if (Array.isArray(data)) {
-      const formatted = data.map((item, index) => {
-        let timeValue = `H${index + 1}`;
-        
-        // Handle time based on filter type
-        if (filterType === "SHIFT" || filterType === "DAY") {
-          timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
-        } else if (filterType === "WEEK" || filterType === "MONTH") {
-          // For WEEK and MONTH, show date only
-          timeValue = item.Date ?? item.ProdDate ?? item.TimeSlot ?? item.HourSlot ?? `H${index + 1}`;
-          // Remove time portion if present
-          if (typeof timeValue === 'string' && timeValue.includes(' ')) {
-            timeValue = timeValue.split(' ')[0];
-          }
-          if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
-            try {
-              const date = new Date(timeValue);
-              if (!isNaN(date.getTime())) {
-                const day = date.getDate();
-                const month = date.getMonth() + 1;
-                timeValue = `${day}/${month}`;
-              }
-            } catch (e) {}
-          }
-        } else {
-          timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
-        }
-        
-        return {
-          hour: timeValue,
-          expected: item.PlannedQty ?? item.PlanQty ?? item.Plan ?? 0,
-          actual: item.ActualQty ?? item.Actual ?? 0,
-        };
-      });
-
-      setPlanActualData(formatted);
-    }
-
-  } catch (error) {
-    console.error("Plan vs Actual API error:", error);
-  } finally {
-    setLoadingQuality(false);
-  }
-};
-const fetchGoodVsRejection = async () => {
-  try {
-    setLoadingQuality(true);
-    const params = {
-      LineID: selectedLine,
-      FilterType: filterType,
-    };
-
-    if (shift) params.Shift = shift;
-
-    if (filterType === "DATERANGE") {
-      params.StartDate = startDate;
-      params.EndDate = endDate;
-    }
-
-    const response = await axios.get(
-      `${BASE_URL}/smtLine/SMTLineGoodVsRejection`,
-      { params }
-    );
-
-    const data = response.data?.data ?? response.data ?? [];
-
-    if (Array.isArray(data)) {
-      const formatted = data.map((item, index) => {
-        let timeValue = `H${index + 1}`;
-        
-        // Handle time based on filter type
-        if (filterType === "SHIFT" || filterType === "DAY") {
-          timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
-        } else if (filterType === "WEEK" || filterType === "MONTH") {
-          // For WEEK and MONTH, show date only
-          timeValue = item.Date ?? item.ProdDate ?? item.TimeSlot ?? item.HourSlot ?? `H${index + 1}`;
-          // Remove time portion if present
-          if (typeof timeValue === 'string' && timeValue.includes(' ')) {
-            timeValue = timeValue.split(' ')[0];
-          }
-          if (typeof timeValue === 'string' && timeValue.match(/^\d{4}-\d{2}-\d{2}/)) {
-            try {
-              const date = new Date(timeValue);
-              if (!isNaN(date.getTime())) {
-                const day = date.getDate();
-                const month = date.getMonth() + 1;
-                timeValue = `${day}/${month}`;
-              }
-            } catch (e) {}
-          }
-        } else {
-          timeValue = item.TimeSlot ?? item.HourSlot ?? item.Hour ?? item.HourNo ?? `H${index + 1}`;
-        }
-        
-        return {
-          hour: timeValue,
-          TotalPart: item.GoodQty ?? item.TotalQty ?? 0,
-          RejectedPart: item.RejectionQty ?? item.BadQty ?? 0,
-        };
-      });
-
-      setGoodRejectData(formatted);
-    }
-
-  } catch (error) {
-    console.error("Good vs Rejection API error:", error);
-  } finally {
-    setLoadingQuality(false);
-  }
-};
-const fetchRejectionReason = async () => {
-  try {
-    setLoadingRejection(true);
-
-    const params = {
-      LineID: selectedLine,
-      FilterType: filterType,
-    };
-
-    if (shift) params.Shift = shift;
-    if (filterType === "DATERANGE") {
-      params.StartDate = startDate;
-      params.EndDate = endDate;
-    }
-
-    const response = await axios.get(
-      `${BASE_URL}/smtLine/SMTLineRejectionReason`,
-      { params }
-    );
-
-    const data = response.data?.data ?? response.data ?? [];
-
-    if (Array.isArray(data)) {
-      const formatted = data.map(item => ({
-        name: item.Reason ?? item.ReasonName ?? item.LossName ?? item.RejectionReason ?? "",
-        value: item.ReasonCount ?? item.TotalCount ?? item.Count ?? item.RejectionCount ?? 0,
-      }));
-
-      setRejectionReasonData(formatted);
-    }
-
-  } catch (error) {
-    console.error("Rejection Reason API error:", error);
-  } finally {
-    setLoadingRejection(false);
-  }
-};
-
-const getColor = (val) => {
-    if (val >= 90 ) return "#16a34a";
-    if (val >=75 && val < 90) return "#f59e0b";
+  const getColor = (val) => {
+    if (val >= 90) return "#16a34a";
+    if (val >= 75 && val < 90) return "#f59e0b";
     return "#dc2626";
   };
 
   return (
     <DashboardLayout>
       <div className="pl-6 pr-6 pb-6 space-y-8 bg-gray-100 min-h-screen">
-         {/* Filters */}
+        {/* Filters */}
         <FilterBar
           filterType={filterType}
           setFilterType={setFilterType}
@@ -1277,9 +1276,9 @@ const getColor = (val) => {
           setEndDate={setEndDate}
         />
 
-       <LineSelector setSelectedLine={setSelectedLine} />
+        <LineSelector setSelectedLine={setSelectedLine} />
 
-       <LineSummary data={lineOEEData} loading={loadingOEE} />
+        <LineSummary data={lineOEEData} loading={loadingOEE} />
 
 
         {/* Line Trends */}
@@ -1289,66 +1288,66 @@ const getColor = (val) => {
           <div className="gap-6">
             {/* LIGHT OEE */}
             <TrendChart
-  title="OEE Trend"
-  data={trendData}
-  dataKey="OEE"
-  color="#93c5fd"
-  light
-/>
+              title="OEE Trend"
+              data={trendData}
+              dataKey="OEE"
+              color="#93c5fd"
+              light
+            />
 
-<TrendChart
-  title="Availability"
-  data={trendData}
-  dataKey="Availability"
-  color="#9b83b4"
-/>
+            <TrendChart
+              title="Availability"
+              data={trendData}
+              dataKey="Availability"
+              color="#9b83b4"
+            />
 
-<TrendChart
-  title="Performance"
-  data={trendData}
-  dataKey="Performance"
-  color="#acb5e0"
-/>
+            <TrendChart
+              title="Performance"
+              data={trendData}
+              dataKey="Performance"
+              color="#acb5e0"
+            />
 
-<TrendChart
-  title="Quality"
-  data={trendData}
-  dataKey="Quality"
-  color="#c52281"
-/>
+            <TrendChart
+              title="Quality"
+              data={trendData}
+              dataKey="Quality"
+              color="#c52281"
+            />
 
           </div>
         </div>
 
-     
 
-       <M4DowntimeAnalysis
-  durationData={m4DurationData}
-  occurrenceData={m4OccurrenceData}
-/>
 
-<TPMDowntimeAnalysis
-  durationData={tpmDurationData}
-  occurrenceData={tpmOccurrenceData}
-/>
+        <M4DowntimeAnalysis
+          durationData={m4DurationData}
+          occurrenceData={m4OccurrenceData}
+        />
+
+        <TPMDowntimeAnalysis
+          durationData={tpmDurationData}
+          occurrenceData={tpmOccurrenceData}
+        />
 
         <SectionHeader title=" Planned vs Actual​" />
         <QualityHourlyChart data={planActualData} loading={loadingQuality} />
-<SectionHeader title="Good Part vs Rejection Part" />
+        <SectionHeader title="Good Part vs Rejection Part" />
         <QualityHourlyChart2 data={goodRejectData} loading={loadingQuality} />
         <RejectionReason
-  data={rejectionReasonData}
-  loading={loadingRejection}
-/>
+          data={rejectionReasonData}
+          loading={loadingRejection}
+        />
 
 
-          <StationCards
-  selectedLine={selectedLine}
-  filterType={filterType}
-  shift={shift}
-  startDate={startDate}
-  endDate={endDate}
-/>
+        <StationCards
+          selectedLine={selectedLine}
+          filterType={filterType}
+          shift={shift}
+          startDate={startDate}
+          endDate={endDate}
+        />
 
 
       </div>

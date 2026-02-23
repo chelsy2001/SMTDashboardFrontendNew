@@ -192,7 +192,21 @@ const AssmblySelector = ({ activeGroup, setActiveGroup }) => {
 /* ================== LINE CARDS ================== */
 const AssemblyLineCard = ({ lines }) => {
   const navigate = useNavigate();
+  // ✅ ADD HERE
+  const getColor = (val) => {
+    if (val >= 90) return "#16a34a";  // Green
+    if (val >= 75 && val < 90) return "#f59e0b";  // Yellow
+    return "#dc2626";  // Red
+  };
 
+  // Optional No Data condition
+  if (!lines || !lines.length) {
+    return (
+      <div className="text-center py-6 text-gray-600 font-semibold">
+        No Line Data
+      </div>
+    );
+  }
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
@@ -214,10 +228,10 @@ const AssemblyLineCard = ({ lines }) => {
                   {lineName}
                 </p>
 
-                <KpiBar label="OEE" value={line.OEE} color="#2563eb" />
-                <KpiBar label="A" value={line.Availability} color="#16a34a" />
-                <KpiBar label="P" value={line.Performance} color="#f59e0b" />
-                <KpiBar label="Q" value={line.Quality} color="#22c55e" />
+               <KpiBar label="OEE" value={line.OEE} color={getColor(line.OEE)} />
+<KpiBar label="A" value={line.Availability} color={getColor(line.Availability)} />
+<KpiBar label="P" value={line.Performance} color={getColor(line.Performance)} />
+<KpiBar label="Q" value={line.Quality} color={getColor(line.Quality)} />
                {/* View Details Button */}
               <div className="pt-3 flex justify-center">
                 <button
