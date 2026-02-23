@@ -21,7 +21,7 @@ function Header({ sidebarOpen, setSidebarOpen }) {
   const routeConfig = {
     "/home": { title: "Home", icon: MdHome },
     "/LinesPreformance": { title: "Lines Performance", icon: MdAssessment },
-    "/LinesStationPreformance": { title: "Lines Station Performance", icon: MdBuild },
+    "/LinesStationPreformance": { title: "Line Station Performance", icon: MdBuild },
     "/AssemblyLinePreformance": { title: "Assembly Line Performance", icon: MdFactory },
     "/Assembly": { title: "Assembly", icon: MdEngineering },
     "/DownTime": { title: "DownTime", icon: MdCheckCircle },
