@@ -8,7 +8,8 @@ import {
   MdTune,
   MdSpeed,
   MdDashboard,
-  MdSoap,
+  MdAssessment,
+  MdFactory,
 } from "react-icons/md";
 
 import UserMenu from "../components/DropdownProfile";
@@ -18,8 +19,10 @@ function Header({ sidebarOpen, setSidebarOpen }) {
   const location = useLocation();
 
   const routeConfig = {
-    "/Home": { title: "Home", icon: MdHome },
-    "/Line": { title: "Line", icon: MdBuild },
+    "/home": { title: "Home", icon: MdHome },
+    "/LinesPreformance": { title: "Lines Performance", icon: MdAssessment },
+    "/LinesStationPreformance": { title: "Lines Station Performance", icon: MdBuild },
+    "/AssemblyLinePreformance": { title: "Assembly Line Performance", icon: MdFactory },
     "/Assembly": { title: "Assembly", icon: MdEngineering },
     "/DownTime": { title: "DownTime", icon: MdCheckCircle },
     "/CycleTime": { title: "Cycle Time", icon: MdTune },
