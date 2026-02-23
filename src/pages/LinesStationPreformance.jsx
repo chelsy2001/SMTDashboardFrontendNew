@@ -378,10 +378,10 @@ const FilterBar = ({
 const StationSummary = ({ oeeData, loading }) => {
   if (loading) return <div className="text-center py-8">Loading Station OEE...</div>;
   const d = oeeData || {};
-  const oee = Number(d.OEEPct ?? d.OEE ?? 0);
-  const avail = Number(d.AvailabilityPct ?? d.A ?? 0);
-  const perf = Number(d.PerformancePct ?? d.P ?? 0);
-  const qual = Number(d.QualityPct ?? d.Q ?? 0);
+  const oee = Number(d.OEEPct ?? d.OEE ?? d.oee ?? 0);
+  const avail = Number(d.AvailabilityPct ?? d.Availability ?? d.A ?? d.a ?? 0);
+  const perf = Number(d.PerformancePct ?? d.Performance ?? d.P ?? d.p ?? 0);
+  const qual = Number(d.QualityPct ?? d.Quality ?? d.Q ?? d.q ?? 0);
   const plan = d.Plan ?? d.PlanQty ?? "0";
   const actual = d.Actual ?? d.ActualQty ?? "0";
   const downtime = d.Downtime ?? d.DowntimeMin ?? "0";
@@ -599,10 +599,10 @@ const LinesStationPreformance = () => {
             
             return {
               time: timeValue,
-              OEE: item.OEEPct ?? 0,
-              Availability: item.AvailabilityPct ?? 0,
-              Performance: item.PerformancePct ?? 0,
-              Quality: item.QualityPct ?? 0,
+              OEE: item.OEEPct ?? item.OEE ?? item.oee ?? 0,
+              Availability: item.AvailabilityPct ?? item.Availability ?? item.A ?? item.a ?? 0,
+              Performance: item.PerformancePct ?? item.Performance ?? item.P ?? item.p ?? 0,
+              Quality: item.QualityPct ?? item.Quality ?? item.Q ?? item.q ?? 0,
             };
           })
         : [];
