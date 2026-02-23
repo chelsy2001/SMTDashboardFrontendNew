@@ -19,7 +19,7 @@ function Header({ sidebarOpen, setSidebarOpen }) {
   const location = useLocation();
 
   const routeConfig = {
-    "/home": { title: "Home", icon: MdHome },
+    "/Home": { title: "Home", icon: MdHome },
     "/LinesPreformance": { title: "Lines Performance", icon: MdAssessment },
     "/LinesStationPreformance": { title: "Line Station Performance", icon: MdBuild },
     "/AssemblyLinePreformance": { title: "Assembly Line Performance", icon: MdFactory },

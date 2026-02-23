@@ -63,9 +63,8 @@ function Sidebar({
     <div className="min-w-fit">
       {/* Sidebar backdrop (mobile only) */}
       <div
-        className={`fixed inset-0 bg-gray-900/30 z-40 lg:hidden lg:z-auto transition-opacity duration-200 ${
-          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-gray-900/30 z-40 lg:hidden lg:z-auto transition-opacity duration-200 ${sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
         aria-hidden="true"
       ></div>
 
@@ -93,10 +92,10 @@ function Sidebar({
           {/* Logo */}
           <NavLink end to="/home" className="block">
             {sidebarExpanded && (
-              <img 
-                src={logo}  
-                alt="Logo"                    
-                className="w-28 h-8"       
+              <img
+                src={logo}
+                alt="Logo"
+                className="w-28 h-8"
               />
             )}
           </NavLink>
@@ -107,35 +106,34 @@ function Sidebar({
           {/* Pages group */}
           <div>
             <ul className="mt-3">
-                                            {/* Dashboard */}
-{/*Home */}                              
+              {/* Dashboard */}
+              {/*Home */}
               <SidebarLinkGroup activecondition={pathname === "/Home"}>
-                  {(handleClick, open) => (
-                    <NavLink
-                      end
-                      to="/Home"
-                      className={({ isActive }) =>
-                        `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
-                          isActive
-                            ? "text-violet-500"
-                            : "hover:text-gray-900 dark:hover:text-white"
-                        }`
-                      }
-                      onClick={() => {
-                        handleClick();
-                        setSidebarExpanded(true);
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                           <MdHome size={20} />
-                          <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                            Home
-                          </span>
-                        </div>
+                {(handleClick, open) => (
+                  <NavLink
+                    end
+                    to="/Home"
+                    className={({ isActive }) =>
+                      `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${isActive
+                        ? "text-violet-500"
+                        : "hover:text-gray-900 dark:hover:text-white"
+                      }`
+                    }
+                    onClick={() => {
+                      handleClick();
+                      setSidebarExpanded(true);
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <MdHome size={20} />
+                        <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                          Home
+                        </span>
                       </div>
-                    </NavLink>
-                  )}
+                    </div>
+                  </NavLink>
+                )}
               </SidebarLinkGroup>
 
 
@@ -143,136 +141,132 @@ function Sidebar({
               <SidebarLinkGroup activecondition={pathname.includes("LinesPreformance")}>
 
                 {(handleClick, open) => (
-                    <NavLink
-                      end
-                      to="/LinesPreformance"
-                      className={({ isActive }) =>
-                        `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
-                          isActive
-                            ? "text-violet-500"
-                            : "hover:text-gray-900 dark:hover:text-white"
-                        }`
-                      }
-                      onClick={() => {
-                        handleClick();
-                        setSidebarExpanded(true);
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                           <MdEngineering size={20} />
-                            <span
-  className="
+                  <NavLink
+                    end
+                    to="/LinesPreformance"
+                    className={({ isActive }) =>
+                      `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${isActive
+                        ? "text-violet-500"
+                        : "hover:text-gray-900 dark:hover:text-white"
+                      }`
+                    }
+                    onClick={() => {
+                      handleClick();
+                      setSidebarExpanded(true);
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <MdEngineering size={20} />
+                        <span
+                          className="
     text-sm font-medium ml-4 
     lg:opacity-0 lg:sidebar-expanded:opacity-100 
     2xl:opacity-100 duration-200
     whitespace-normal break-words leading-tight block max-w-[150px]
   "
->
-  Line Preformance
-</span>
+                        >
+                          Line Preformance
+                        </span>
 
-                          </div>
-                        </div>
-                    </NavLink>
+                      </div>
+                    </div>
+                  </NavLink>
                 )}
-               
+
               </SidebarLinkGroup>
 
               {/* Assembly */}
               <SidebarLinkGroup activecondition={pathname.includes("Assembly")}>
                 {(handleClick, open) => (
-                    <NavLink
-                      end
-                      to="/Assembly"
-                      className={({ isActive }) =>
-                        `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
-                          isActive
-                            ? "text-violet-500"
-                            : "hover:text-gray-900 dark:hover:text-white"
-                        }`
-                      }
-                      onClick={() => {
-                        handleClick();
-                        setSidebarExpanded(true);
-                      }}
-                    >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                           <MdCheckCircle size={20} />
-                            <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                              Assembly 
-                            </span>
-                          </div>
-                        </div>
-                    </NavLink>
+                  <NavLink
+                    end
+                    to="/Assembly"
+                    className={({ isActive }) =>
+                      `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${isActive
+                        ? "text-violet-500"
+                        : "hover:text-gray-900 dark:hover:text-white"
+                      }`
+                    }
+                    onClick={() => {
+                      handleClick();
+                      setSidebarExpanded(true);
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <MdCheckCircle size={20} />
+                        <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                          Assembly
+                        </span>
+                      </div>
+                    </div>
+                  </NavLink>
                 )}
-                
+
               </SidebarLinkGroup>
 
               {/* DownTime   */}
-              <SidebarLinkGroup activecondition={pathname.includes("DownTime")}>
+              {/* <SidebarLinkGroup activecondition={pathname.includes("DownTime")}>
                 {(handleClick, open) => (
-                    <NavLink
-                      end
-                      to="/DownTime"
-                      className={({ isActive }) =>
-                        `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
-                          isActive
-                            ? "text-violet-500"
-                            : "hover:text-gray-900 dark:hover:text-white"
-                        }`
-                      }
-                      onClick={() => {
-                        handleClick();
-                        setSidebarExpanded(true);
-                      }}
-                    >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                           <MdTune size={20} />
-                            <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                              Downtime 
-                            </span>
-                          </div>
-                        </div>
-                    </NavLink>
+                  <NavLink
+                    end
+                    to="/DownTime"
+                    className={({ isActive }) =>
+                      `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${isActive
+                        ? "text-violet-500"
+                        : "hover:text-gray-900 dark:hover:text-white"
+                      }`
+                    }
+                    onClick={() => {
+                      handleClick();
+                      setSidebarExpanded(true);
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <MdTune size={20} />
+                        <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                          Downtime
+                        </span>
+                      </div>
+                    </div>
+                  </NavLink>
                 )}
-                
-              </SidebarLinkGroup>
+
+              </SidebarLinkGroup> */}
 
 
- {/* Quality */}
-              <SidebarLinkGroup activecondition={pathname.includes("Quality")}>
+              {/* Quality */}
+              {/* <SidebarLinkGroup activecondition={pathname.includes("Quality")}>
                 {(handleClick, open) => (
-                    <NavLink
-                      end
-                      to="/Quality"
-                      className={({ isActive }) =>
-                        `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${
-                          isActive
-                            ? "text-violet-500"
-                            : "hover:text-gray-900 dark:hover:text-white"
-                        }`
-                      }
-                      onClick={() => {
-                        handleClick();
-                        setSidebarExpanded(true);
-                      }}
-                    >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                           <MdSpeed size={20} />
-                            <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                               Quality
-                            </span>
-                          </div>
-                        </div>
-                    </NavLink>
+                  <NavLink
+                    end
+                    to="/Quality"
+                    className={({ isActive }) =>
+                      `block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${isActive
+                        ? "text-violet-500"
+                        : "hover:text-gray-900 dark:hover:text-white"
+                      }`
+                    }
+                    onClick={() => {
+                      handleClick();
+                      setSidebarExpanded(true);
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <MdSpeed size={20} />
+                        <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                          Quality
+                        </span>
+                      </div>
+                    </div>
+                  </NavLink>
                 )}
-              </SidebarLinkGroup>
+              </SidebarLinkGroup> */}
 
-               {/* Cycle Time*/}
+              {/* Cycle Time*/}
               {/* <SidebarLinkGroup activecondition={pathname.includes("CycleTime")}>
                 {(handleClick, open) => (
                     <NavLink
