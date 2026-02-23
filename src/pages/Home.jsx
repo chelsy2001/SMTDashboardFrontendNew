@@ -195,9 +195,9 @@ const LineOLESection = ({ data = [] }) => (
               <p className="font-semibold text-gray-800">
                 {l.LineName}
               </p>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+              {/* <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
                 SMT
-              </span>
+              </span> */}
             </div>
 
             {/* KPIs */}

@@ -68,10 +68,9 @@ const FilterBar = ({
               key={f}
               onClick={() => setFilterType(f)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition
-                ${
-                  filterType === f
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ${filterType === f
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }
               `}
             >
@@ -171,10 +170,9 @@ const AssmblySelector = ({ activeGroup, setActiveGroup }) => {
                   className={`
                     w-70 py-3 rounded-xl text-sm font-semibold
                     border transition-all duration-300
-                    ${
-                      isActive
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg border-transparent"
-                        : "bg-gray-50 text-black border-gray-200 hover:bg-blue-50"
+                    ${isActive
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg border-transparent"
+                      : "bg-gray-50 text-black border-gray-200 hover:bg-blue-50"
                     }
                   `}
                 >
@@ -228,33 +226,33 @@ const AssemblyLineCard = ({ lines }) => {
                   {lineName}
                 </p>
 
-               <KpiBar label="OEE" value={line.OEE} color={getColor(line.OEE)} />
-<KpiBar label="A" value={line.Availability} color={getColor(line.Availability)} />
-<KpiBar label="P" value={line.Performance} color={getColor(line.Performance)} />
-<KpiBar label="Q" value={line.Quality} color={getColor(line.Quality)} />
-               {/* View Details Button */}
-              <div className="pt-3 flex justify-center">
-                <button
-                  onClick={() =>
-                    navigate("/LinesStationPreformance", {
-                      state: {
-                        stationName: station.StationName,
-                        stationId: station.StationID,
-                        lineId: selectedLine,
-                      },
-                    })
-                  }
-                  className="px-5 py-2 text-sm font-semibold rounded-full 
+                <KpiBar label="OEE" value={line.OEE} color={getColor(line.OEE)} />
+                <KpiBar label="A" value={line.Availability} color={getColor(line.Availability)} />
+                <KpiBar label="P" value={line.Performance} color={getColor(line.Performance)} />
+                <KpiBar label="Q" value={line.Quality} color={getColor(line.Quality)} />
+                {/* View Details Button */}
+                <div className="pt-3 flex justify-center">
+                  <button
+                    onClick={() =>
+                      navigate("/LinesStationPreformance", {
+                        state: {
+                          stationName: station.StationName,
+                          stationId: station.StationID,
+                          lineId: selectedLine,
+                        },
+                      })
+                    }
+                    className="px-5 py-2 text-sm font-semibold rounded-full 
                    bg-gradient-to-r from-blue-500 to-indigo-600 
                    text-white shadow-md 
                    hover:from-indigo-600 hover:to-blue-500 
                    hover:scale-105 
                    active:scale-95 
                    transition-all duration-300"
-                >
-                  View Details →
-                </button>
-              </div>
+                  >
+                    View Details →
+                  </button>
+                </div>
               </CardContent>
             </Card>
           );
